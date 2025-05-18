@@ -1,29 +1,33 @@
-name: center OpenWrt IPK Packages
+name: OpenWrt IPK Center
 
 on:
   schedule:
-    - cron: '0 2 */7 * *'  # 每7天（UTC 2:00，约北京时间上午10:00）自动运行
-  workflow_dispatch:       # 支持手动触发运行
+    - cron: '0 0 */7 * *'  # 每7天运行一次
+  workflow_dispatch:       # 支持手动运行
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y curl jq wget
-
-      - name: Run sync script
-        run: bash scripts/main.sh
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          name: openwrt-ipk-center-output
-          path: output/
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run Sync Script
+        run: python main.py
+
+      - name: Upload IPKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: ipk-files
+          path: downloads
 
