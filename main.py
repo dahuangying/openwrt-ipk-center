@@ -30,15 +30,19 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     log_ok(f"Generated HTML index: {index_file}")
 
 def main():
-    # 这里写你的主逻辑
-    pass
+    # 示例：生成一个假的 IPK 目录结构（可删除）
+    (OPKG_DIR / "x86_64" / "luci-app-demo" / "1.0.0").mkdir(parents=True, exist_ok=True)
+    # 添加一个假文件
+    fake_ipk = OPKG_DIR / "x86_64" / "luci-app-demo" / "1.0.0" / "luci-app-demo_1.0.0_all.ipk"
+    fake_ipk.write_text("Fake IPK Content")
 
 # 这里改成你实际存放 ipk 目录路径
-OPKG_DIR = Path("path/to/opkg_dir")
+OPKG_DIR = Path("output")
 
 if __name__ == "__main__":
     main()
     generate_html_index(OPKG_DIR, Path("docs"))
+
 
 
 
