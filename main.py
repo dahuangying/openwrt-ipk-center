@@ -133,11 +133,8 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     for platform_dir in sorted(opkg_dir.glob("*")):
         for plugin_dir in sorted(platform_dir.glob("*")):
             for version_dir in sorted(plugin_dir.glob("*")):
-                try:
-                    rel_path = version_dir.relative_to(opkg_dir)
-                except ValueError:
-                    rel_path = version_dir.name
-
+                # 直接用目录拼接路径，避免 relative_to 报错
+                rel_path = f"{platform_dir.name}/{plugin_dir.name}/{version_dir.name}"
                 html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
 
     html.append("</ul></body></html>")
