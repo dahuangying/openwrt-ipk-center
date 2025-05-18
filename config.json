@@ -3,18 +3,19 @@
     {
       "name": "passwall",
       "repo": "xiaorouji/openwrt-passwall",
-      "platforms": ["aarch64_cortex-a53", "x86_64"]
+      "platforms": ["passwall"]
     },
     {
       "name": "passwall2",
       "repo": "xiaorouji/openwrt-passwall2",
-      "platforms": ["aarch64_cortex-a53", "x86_64"]
+      "platforms": ["passwall2"]
     },
     {
       "name": "openclash",
       "repo": "vernesong/OpenClash",
-      "platforms": ["aarch64_cortex-a53", "x86_64"]
+      "platforms": ["openclash"]
     }
   ]
 }
+
 
