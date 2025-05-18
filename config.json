@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    {
+      "name": "passwall",
+      "repo": "xiaorouji/openwrt-passwall"
+    },
+    {
+      "name": "passwall2",
+      "repo": "xiaorouji/openwrt-passwall2"
+    },
+    {
+      "name": "openclash",
+      "repo": "vernesong/OpenClash"
+    }
+  ]
+}
