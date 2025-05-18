@@ -28,9 +28,6 @@ jobs:
       - name: Run sync script
         run: python main.py
 
-      - name: Copy output to docs  # ✅ 新增步骤
-        run: cp -r output docs
-
       - name: List docs directory
         run: ls -la ./docs
 
