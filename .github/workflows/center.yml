@@ -31,12 +31,13 @@ jobs:
       - name: List docs directory
         run: ls -la ./docs
 
-     - name: Deploy to GitHub Pages
-       uses: peaceiris/actions-gh-pages@v3
-       with:
-         github_token: ${{ secrets.GITHUB_TOKEN }}
-         publish_dir: ./docs/opkg  # ← 修改这里！
-         exclude: ''
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/opkg
+          exclude: ''
+
 
 
 
