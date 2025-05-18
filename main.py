@@ -12,6 +12,7 @@ from pathlib import Path
 CONFIG_FILE = "config.json"
 ARCHIVE_DIR = Path("docs/archive")
 OPKG_DIR = Path("docs/opkg")
+DOCS_DIR = Path("docs")  # 用来存放 index.html
 
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
@@ -61,8 +62,7 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=3):
     if opkg_path.exists():
         shutil.rmtree(opkg_path)
     for version in latest:
-        rel_ver = version.name
-        target_ver = opkg_path / rel_ver
+        target_ver = opkg_path / version.name
         shutil.copytree(version, target_ver)
 
 def generate_packages_index(opkg_plugin_path: Path):
@@ -71,7 +71,6 @@ def generate_packages_index(opkg_plugin_path: Path):
         log(f"No IPK files to generate Packages at {opkg_plugin_path}")
         return
 
-    # 执行命令：opkg-utils 下的 'ipkg-make-index'（必须预装）
     try:
         subprocess.run(
             ["ipkg-make-index", "."],
@@ -108,21 +107,47 @@ def sync_plugin(plugin):
                         if download_asset(asset_url, save_path):
                             new_count += 1
 
-    # 清理 archive 中旧版本（只保留10个）
     for platform in plugin['platforms']:
         clean_old_versions(ARCHIVE_DIR / platform / plugin['name'], keep=10)
 
-        # 复制最新 3 个版本到 opkg 目录
         copy_latest_to_opkg(
             ARCHIVE_DIR / platform / plugin['name'],
             OPKG_DIR / platform / plugin['name'],
             keep=3
         )
 
-        # 生成 Packages 索引
         generate_packages_index(OPKG_DIR / platform / plugin['name'])
 
     log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
+
+# === 新增 generate_html_index 相关函数开始 ===
+
+def generate_html_index(opkg_dir: Path, output_path: Path):
+    output_path.mkdir(parents=True, exist_ok=True)
+    index_file = output_path / "index.html"
+
+    html = ["<html><head><meta charset='utf-8'><title>OpenWrt IPK Center</title></head><body>"]
+    html.append("<h1>OpenWrt IPK Center</h1>")
+    html.append("<ul>")
+
+    for platform_dir in sorted(opkg_dir.glob("*")):
+        for plugin_dir in sorted(platform_dir.glob("*")):
+            for version_dir in sorted(plugin_dir.glob("*")):
+                try:
+                    rel_path = version_dir.relative_to(opkg_dir)
+                except ValueError:
+                    rel_path = version_dir.name
+
+                html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
+
+    html.append("</ul></body></html>")
+
+    with open(index_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(html))
+
+    log_ok(f"Generated HTML index: {index_file}")
+
+# === 新增 generate_html_index 相关函数结束 ===
 
 def main():
     if not os.path.isfile(CONFIG_FILE):
@@ -140,7 +165,11 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
+    # 同步完成后生成 HTML 索引页面
+    generate_html_index(OPKG_DIR, DOCS_DIR)
+
 if __name__ == "__main__":
     main()
+
 
 
