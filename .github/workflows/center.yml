@@ -1,13 +1,15 @@
 name: Build and Deploy IPK Center
 
 on:
-  schedule:           # 每周日凌晨1点自动触发
+  schedule:
     - cron: '0 1 * * 0'
-  workflow_dispatch:  # 支持手动触发 
+  workflow_dispatch:
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -26,11 +28,15 @@ jobs:
       - name: Run sync script
         run: python main.py
 
+      - name: List docs directory
+        run: ls -la ./docs
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
+
 
 
 
