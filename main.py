@@ -163,7 +163,7 @@ def main():
         sync_plugin(plugin)
 
     # 同步完成后生成 HTML 索引页面
-    generate_html_index(OPKG_DIR, DOCS_DIR)
+    generate_html_index(OPKG_DIR, OPKG_DIR)
 
 if __name__ == "__main__":
     main()
