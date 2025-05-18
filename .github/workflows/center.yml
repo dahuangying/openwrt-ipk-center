@@ -1,12 +1,9 @@
 name: Build and Deploy IPK Center
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:  # 支持手动触发
   schedule:           # 每周日凌晨1点自动触发
     - cron: '0 1 * * 0'
+  workflow_dispatch:  # 支持手动触发 
 
 jobs:
   build-deploy:
