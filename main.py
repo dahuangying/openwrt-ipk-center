@@ -123,7 +123,7 @@ def sync_plugin(plugin):
             asset_url = asset['browser_download_url']
 
             for platform in plugin['platforms']:
-                if platform in asset_name:
+                if platform in asset_name or plugin["name"] in asset_name.lower():
                     archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
                     save_path = archive_dir / asset_name
                     if not save_path.exists():
