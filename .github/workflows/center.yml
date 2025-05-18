@@ -1,4 +1,4 @@
-name: Sync OpenWrt IPK Packages
+name: center OpenWrt IPK Packages
 
 on:
   schedule:
