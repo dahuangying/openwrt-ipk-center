@@ -1,3 +1,8 @@
+from pathlib import Path
+
+def log_ok(msg):
+    print("[OK]", msg)
+
 def generate_html_index(opkg_dir: Path, output_path: Path):
     output_path.mkdir(parents=True, exist_ok=True)
     index_file = output_path / "index.html"
@@ -9,7 +14,12 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     for platform_dir in sorted(opkg_dir.glob("*")):
         for plugin_dir in sorted(platform_dir.glob("*")):
             for version_dir in sorted(plugin_dir.glob("*")):
-                rel_path = version_dir.relative_to("docs")
+                # 用 opkg_dir 做基准路径
+                try:
+                    rel_path = version_dir.relative_to(opkg_dir)
+                except ValueError:
+                    rel_path = version_dir.name  # 退化处理
+
                 html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
 
     html.append("</ul></body></html>")
@@ -19,10 +29,17 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     log_ok(f"Generated HTML index: {index_file}")
 
+def main():
+    # 这里写你的主逻辑
+    pass
+
+# 这里改成你实际存放 ipk 目录路径
+OPKG_DIR = Path("path/to/opkg_dir")
 
 if __name__ == "__main__":
     main()
-    generate_html_index(OPKG_DIR, Path("docs"))  # 👈 仅新增这一行调用
+    generate_html_index(OPKG_DIR, Path("docs"))
+
 
 
 
