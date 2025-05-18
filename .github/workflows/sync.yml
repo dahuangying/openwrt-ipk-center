@@ -1,0 +1,25 @@
+name: Sync IPK Packages
+
+on:
+  schedule:
+    - cron: '0 0 */7 * *'  # 每7天执行一次
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup environment
+        run: sudo apt-get update && sudo apt-get install -y jq wget
+
+      - name: Run sync script
+        run: bash scripts/main.sh
+
+      - name: Upload IPK artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ipk-packages
+          path: output/
