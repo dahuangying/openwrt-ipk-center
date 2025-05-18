@@ -120,7 +120,7 @@ def sync_plugin(plugin):
 
     log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
 
-# === 新增 generate_html_index 相关函数开始 ===
+# === HTML 索引生成 ===
 
 def generate_html_index(opkg_dir: Path, output_path: Path):
     output_path.mkdir(parents=True, exist_ok=True)
@@ -133,7 +133,6 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     for platform_dir in sorted(opkg_dir.glob("*")):
         for plugin_dir in sorted(platform_dir.glob("*")):
             for version_dir in sorted(plugin_dir.glob("*")):
-                # 直接用目录拼接路径，避免 relative_to 报错
                 rel_path = f"{platform_dir.name}/{plugin_dir.name}/{version_dir.name}"
                 html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
 
@@ -144,7 +143,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     log_ok(f"Generated HTML index: {index_file}")
 
-# === 新增 generate_html_index 相关函数结束 ===
+# === 主程序 ===
 
 def main():
     if not os.path.isfile(CONFIG_FILE):
@@ -162,11 +161,12 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
-    # 同步完成后生成 HTML 索引页面
+    # 生成 index.html 到 docs/opkg 下
     generate_html_index(OPKG_DIR, OPKG_DIR)
 
 if __name__ == "__main__":
     main()
+
 
 
 
