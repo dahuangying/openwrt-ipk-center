@@ -1,10 +1,8 @@
-for platform_dir in sorted(opkg_dir.glob("*")):
-    for plugin_dir in sorted(platform_dir.glob("*")):
-        for version_dir in sorted(plugin_dir.glob("*")):
-            # 用 opkg_dir 做基准路径
-            try:
-                rel_path = version_dir.relative_to(opkg_dir)
-            except ValueError:
-                rel_path = version_dir.name  # 退化处理
-
-            html.append(f"<li><a href='{rel_path}/'>{platform_dir.name}/{plugin_dir.name}/{version_dir.name}</a></li>")
+<html><head><meta charset='utf-8'><title>OpenWrt IPK Center</title></head><body>
+<h1>OpenWrt IPK Center</h1>
+<ul>
+<li><a href='passwall2/passwall2/1.31-1/'>passwall2/passwall2/1.31-1</a></li>
+<li><a href='passwall2/passwall2/24.11.13-1/'>passwall2/passwall2/24.11.13-1</a></li>
+<li><a href='passwall2/passwall2/24.11.17-2/'>passwall2/passwall2/24.11.17-2</a></li>
+<li><a href='passwall2/passwall2/Packages/'>passwall2/passwall2/Packages</a></li>
+</ul></body></html>
