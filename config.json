@@ -1,9 +1,9 @@
 {
   "plugins": [
-    {
-      "name": "passwall2",
-      "repo": "xiaorouji/openwrt-passwall2",
-      "platforms": ["passwall2"]
+  {
+      "name": "passwall",
+      "repo": "xiaorouji/openwrt-passwall",
+      "platforms": ["aarch64_cortex-a53", "x86_64"]
     }
   ]
 }
