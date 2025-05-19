@@ -1,19 +1,9 @@
 {
   "plugins": [
     {
-      "name": "passwall",
-      "repo": "xiaorouji/openwrt-passwall",
-      "platforms": ["passwall"]
-    },
-    {
       "name": "passwall2",
       "repo": "xiaorouji/openwrt-passwall2",
       "platforms": ["passwall2"]
-    },
-    {
-      "name": "openclash",
-      "repo": "vernesong/OpenClash",
-      "platforms": ["openclash"]
     }
   ]
 }
