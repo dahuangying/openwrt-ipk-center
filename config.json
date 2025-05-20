@@ -11,7 +11,7 @@
       "repo": "xiaorouji/openwrt-passwall2",
       "platforms": ["aarch64_cortex-a53", "aarch64_generic", "x86_64"],
       "release_type": "stable"
-    },
+    }
   ]
 }
 
