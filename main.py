@@ -89,17 +89,24 @@ def sync_plugin(plugin):
         log(f"No releases found for {plugin['name']}.")
         return
 
-    stable_releases = [r for r in releases if is_stable_version(r['tag_name'])]
-    stable_releases.sort(key=lambda r: r['published_at'], reverse=True)
+    # 根据 release_type 筛选版本
+    release_type = plugin.get("release_type", "stable").lower()
+    if release_type == "stable":
+        filtered_releases = [r for r in releases if not r.get("prerelease", False) and is_stable_version(r['tag_name'])]
+    elif release_type == "pre_release":
+        filtered_releases = [r for r in releases if r.get("prerelease", False)]
+    else:  # both
+        filtered_releases = releases
+
+    filtered_releases.sort(key=lambda r: r['published_at'], reverse=True)
     new_count = 0
 
-    for release in stable_releases:
+    for release in filtered_releases:
         tag = release['tag_name']
         for asset in release.get('assets', []):
             asset_name = asset['name']
             asset_url = asset['browser_download_url']
 
-            # === 新增：跳过非 IPK 文件 ===
             if not asset_name.endswith(".ipk"):
                 log(f"Skipping non-IPK file: {asset_name}")
                 continue
@@ -125,8 +132,6 @@ def sync_plugin(plugin):
 
     log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
 
-# === HTML 索引生成 ===
-
 def generate_html_index(opkg_dir: Path, output_path: Path):
     output_path.mkdir(parents=True, exist_ok=True)
     index_file = output_path / "index.html"
@@ -148,8 +153,6 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     log_ok(f"Generated HTML index: {index_file}")
 
-# === 主程序 ===
-
 def main():
     if not os.path.isfile(CONFIG_FILE):
         log(f"Config file {CONFIG_FILE} not found!")
@@ -166,11 +169,11 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
-    # 生成 index.html 到 docs/opkg 下
     generate_html_index(OPKG_DIR, OPKG_DIR)
 
 if __name__ == "__main__":
     main()
+
 
 
 
