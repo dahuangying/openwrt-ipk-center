@@ -97,7 +97,10 @@ def sync_plugin(plugin):
     else:
         filtered_releases = releases
 
+    # 只处理最新 2 个 release
     filtered_releases.sort(key=lambda r: r['published_at'], reverse=True)
+    filtered_releases = filtered_releases[:2]
+
     new_count = 0
 
     for release in filtered_releases:
@@ -111,7 +114,7 @@ def sync_plugin(plugin):
                 continue
 
             for platform in plugin['platforms']:
-                if platform in asset_name or "_all.ipk" in asset_name:
+                if platform in asset_name or asset_name.endswith("_all.ipk"):
                     archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
                     save_path = archive_dir / asset_name
                     if not save_path.exists():
@@ -172,6 +175,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
