@@ -12,18 +12,6 @@
       "platforms": ["aarch64_cortex-a53", "aarch64_generic", "x86_64"],
       "release_type": "stable"
     },
-    {
-      "name": "openclash",
-      "repo": "vernesong/OpenClash",
-      "platforms": ["aarch64_cortex-a53", "aarch64_generic", "x86_64"],
-      "release_type": "both"
-    },
-    {
-      "name": "shadowsocks",
-      "repo": "shadowsocks/luci-app-shadowsocks",
-      "platforms": ["aarch64_cortex-a53", "aarch64_generic", "x86_64"],
-      "release_type": "pre_release"
-    }
   ]
 }
 
