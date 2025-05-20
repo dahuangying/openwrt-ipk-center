@@ -99,6 +99,11 @@ def sync_plugin(plugin):
             asset_name = asset['name']
             asset_url = asset['browser_download_url']
 
+            # 跳过非 .ipk 文件（如 .zip, .tar.gz 等）
+            if not asset_name.endswith(".ipk"):
+                log(f"Skipping non-IPK file: {asset_name}")
+                continue
+
             for platform in plugin['platforms']:
                 if platform in asset_name:
                     archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
@@ -166,7 +171,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 
