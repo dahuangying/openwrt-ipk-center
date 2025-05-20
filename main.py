@@ -7,7 +7,6 @@ import shutil
 import requests
 import subprocess
 from pathlib import Path
-from packaging import version  # 用于版本号对比
 
 # 配置
 CONFIG_FILE = "config.json"
@@ -59,15 +58,12 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     latest = versions[:keep]
 
+    # 清空 opkg path
     if opkg_path.exists():
         shutil.rmtree(opkg_path)
     for version in latest:
         target_ver = opkg_path / version.name
         shutil.copytree(version, target_ver)
-
-def extract_version(ipk_name: str) -> str:
-    match = re.search(r"_(\d[\w\.\-]*)_.*\.ipk$", ipk_name)
-    return match.group(1) if match else "0.0.0"
 
 def generate_packages_index(opkg_plugin_path: Path):
     pkg_files = list(opkg_plugin_path.glob("**/*.ipk"))
@@ -86,6 +82,11 @@ def generate_packages_index(opkg_plugin_path: Path):
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
+def parse_simple_version(v):
+    # 提取版本号中的数字部分，忽略后面的字母等非数字
+    parts = re.findall(r'\d+', v)
+    return tuple(map(int, parts)) if parts else ()
+
 def sync_plugin(plugin):
     log(f"Syncing {plugin['name']}...")
     releases = get_releases(plugin['repo'])
@@ -101,34 +102,48 @@ def sync_plugin(plugin):
     else:
         filtered_releases = releases
 
+    # 按发布时间倒序，取最新两个
     filtered_releases.sort(key=lambda r: r['published_at'], reverse=True)
+    filtered_releases = filtered_releases[:2]
+
     new_count = 0
-    downloaded_versions = {}
 
     for release in filtered_releases:
         tag = release['tag_name']
+        # 用来记录每个平台每个插件的最新版本
+        latest_versions = {}
+
         for asset in release.get('assets', []):
             asset_name = asset['name']
             asset_url = asset['browser_download_url']
 
             if not asset_name.endswith(".ipk"):
+                log(f"Skipping non-IPK file: {asset_name}")
                 continue
 
-            version_str = extract_version(asset_name)
+            # 从文件名提取版本号（假设格式是 _版本号_，如 _25.5.8-1_）
+            version_match = re.search(r'_(\d[\d\.]*\-?\d*)', asset_name)
+            if not version_match:
+                log(f"Cannot parse version from {asset_name}, skipping.")
+                continue
+            version_str = version_match.group(1)
+
             for platform in plugin['platforms']:
                 if platform in asset_name or asset_name.endswith("_all.ipk"):
-                    key = (platform, plugin['name'], asset_name.split('_')[0])
-                    prev_version = downloaded_versions.get(key)
-                    if not prev_version or version.parse(version_str) > version.parse(prev_version[0]):
-                        downloaded_versions[key] = (version_str, tag, asset_name, asset_url)
+                    prev_version = latest_versions.get(platform)
+                    # 比较版本号
+                    if (not prev_version) or (parse_simple_version(version_str) > parse_simple_version(prev_version[0])):
+                        latest_versions[platform] = (version_str, asset_url, asset_name)
 
-    for (platform, plugin_name, base), (ver, tag, asset_name, asset_url) in downloaded_versions.items():
-        archive_dir = ARCHIVE_DIR / platform / plugin_name / tag
-        save_path = archive_dir / asset_name
-        if not save_path.exists():
-            if download_asset(asset_url, save_path):
-                new_count += 1
+        # 下载最新版本
+        for platform, (ver, url, name) in latest_versions.items():
+            archive_dir = ARCHIVE_DIR / platform / plugin['name'] / ver
+            save_path = archive_dir / name
+            if not save_path.exists():
+                if download_asset(url, save_path):
+                    new_count += 1
 
+    # 清理旧版本，复制最新，生成索引
     for platform in plugin['platforms']:
         platform_archive_path = ARCHIVE_DIR / platform / plugin['name']
         opkg_path = OPKG_DIR / platform / plugin['name']
@@ -157,6 +172,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
                 html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
 
     html.append("</ul></body></html>")
+
     with open(index_file, "w", encoding="utf-8") as f:
         f.write("\n".join(html))
 
@@ -182,6 +198,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
