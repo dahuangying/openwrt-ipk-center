@@ -89,13 +89,12 @@ def sync_plugin(plugin):
         log(f"No releases found for {plugin['name']}.")
         return
 
-    # 根据 release_type 筛选版本
     release_type = plugin.get("release_type", "stable").lower()
     if release_type == "stable":
         filtered_releases = [r for r in releases if not r.get("prerelease", False) and is_stable_version(r['tag_name'])]
     elif release_type == "pre_release":
         filtered_releases = [r for r in releases if r.get("prerelease", False)]
-    else:  # both
+    else:
         filtered_releases = releases
 
     filtered_releases.sort(key=lambda r: r['published_at'], reverse=True)
@@ -112,7 +111,7 @@ def sync_plugin(plugin):
                 continue
 
             for platform in plugin['platforms']:
-                if platform in asset_name:
+                if platform in asset_name or "_all.ipk" in asset_name:
                     archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
                     save_path = archive_dir / asset_name
                     if not save_path.exists():
@@ -173,6 +172,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
