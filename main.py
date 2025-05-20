@@ -99,6 +99,22 @@ def generate_packages_index(opkg_plugin_path: Path):
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
+# 新增函数：判断是否是主插件ipk包，排除依赖包
+def is_main_plugin_ipk(filename: str, plugin_name: str) -> bool:
+    dependency_keywords = [
+        'lib', 'dns2socks', 'microsocks', 'ipt2socks', 'hysteria',
+        'chinadns-ng', 'simple-obfs', 'tcping', 'v2ray', 'xray',
+        'shadowsocks', 'naiveproxy', 'trojan', 'sing-box', 'tuic', 'ssr'
+    ]
+    name_lower = filename.lower()
+    plugin_lower = plugin_name.lower()
+    if plugin_lower in name_lower:
+        for kw in dependency_keywords:
+            if kw in name_lower and kw != plugin_lower:
+                return False
+        return True
+    return False
+
 def sync_plugin(plugin):
     log(f"Syncing {plugin['name']}...")
     releases = get_releases(plugin['repo'])
@@ -124,12 +140,12 @@ def sync_plugin(plugin):
             asset_url = asset['browser_download_url']
 
             for platform in plugin['platforms']:
-                if platform in asset_name:
+                if platform in asset_name and asset_name.endswith(".ipk") and is_main_plugin_ipk(asset_name, plugin['name']):
                     archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
                     save_path = archive_dir / asset_name
                     if not save_path.exists():
                         if download_asset(asset_url, save_path):
-                            # 如果是zip包，自动解压ipk
+                            # 如果是zip包，自动解压ipk（理论上不会解压ipk，这里保留）
                             if save_path.suffix == '.zip':
                                 unzip_ipks(save_path, archive_dir)
                             new_count += 1
