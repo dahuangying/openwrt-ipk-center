@@ -6,6 +6,7 @@ import json
 import shutil
 import requests
 import subprocess
+import zipfile
 from pathlib import Path
 
 # 配置
@@ -45,6 +46,14 @@ def download_asset(url, save_path):
         log(f"Exception during download: {e}")
         return False
 
+def unzip_ipks(zip_path: Path, dest_dir: Path):
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(dest_dir)
+        log_ok(f"Unzipped: {zip_path} to {dest_dir}")
+    except Exception as e:
+        log(f"Failed to unzip {zip_path}: {e}")
+
 def clean_old_versions(base_path: Path, keep=1):
     if not base_path.exists(): return
     versions = [d for d in base_path.iterdir() if d.is_dir()]
@@ -81,14 +90,12 @@ def generate_packages_index(opkg_plugin_path: Path):
             check=True,
             stdout=open(opkg_plugin_path / "Packages", "w")
         )
-        log_ok(f"Generated Packages: {opkg_plugin_path/'Packages'}")
+        # 额外生成 Packages.gz
         subprocess.run(
-            ["gzip", "-9", "-c", "Packages"],
-            cwd=opkg_plugin_path,
-            check=True,
-            stdout=open(opkg_plugin_path / "Packages.gz", "wb")
+            ["gzip", "-kf", str(opkg_plugin_path / "Packages")],
+            check=True
         )
-        log_ok(f"Generated Packages.gz: {opkg_plugin_path/'Packages.gz'}")
+        log_ok(f"Generated Packages and Packages.gz at {opkg_plugin_path}")
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
@@ -122,6 +129,9 @@ def sync_plugin(plugin):
                     save_path = archive_dir / asset_name
                     if not save_path.exists():
                         if download_asset(asset_url, save_path):
+                            # 如果是zip包，自动解压ipk
+                            if save_path.suffix == '.zip':
+                                unzip_ipks(save_path, archive_dir)
                             new_count += 1
 
     for platform in plugin['platforms']:
@@ -183,6 +193,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
