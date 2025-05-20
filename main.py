@@ -82,11 +82,6 @@ def generate_packages_index(opkg_plugin_path: Path):
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
-def parse_simple_version(v):
-    # 提取版本号中的数字部分，忽略后面的字母等非数字
-    parts = re.findall(r'\d+', v)
-    return tuple(map(int, parts)) if parts else ()
-
 def sync_plugin(plugin):
     log(f"Syncing {plugin['name']}...")
     releases = get_releases(plugin['repo'])
@@ -102,7 +97,7 @@ def sync_plugin(plugin):
     else:
         filtered_releases = releases
 
-    # 按发布时间倒序，取最新两个
+    # 只处理最新 2 个 release
     filtered_releases.sort(key=lambda r: r['published_at'], reverse=True)
     filtered_releases = filtered_releases[:2]
 
@@ -110,9 +105,6 @@ def sync_plugin(plugin):
 
     for release in filtered_releases:
         tag = release['tag_name']
-        # 用来记录每个平台每个插件的最新版本
-        latest_versions = {}
-
         for asset in release.get('assets', []):
             asset_name = asset['name']
             asset_url = asset['browser_download_url']
@@ -121,29 +113,14 @@ def sync_plugin(plugin):
                 log(f"Skipping non-IPK file: {asset_name}")
                 continue
 
-            # 从文件名提取版本号（假设格式是 _版本号_，如 _25.5.8-1_）
-            version_match = re.search(r'_(\d[\d\.]*\-?\d*)', asset_name)
-            if not version_match:
-                log(f"Cannot parse version from {asset_name}, skipping.")
-                continue
-            version_str = version_match.group(1)
-
             for platform in plugin['platforms']:
                 if platform in asset_name or asset_name.endswith("_all.ipk"):
-                    prev_version = latest_versions.get(platform)
-                    # 比较版本号
-                    if (not prev_version) or (parse_simple_version(version_str) > parse_simple_version(prev_version[0])):
-                        latest_versions[platform] = (version_str, asset_url, asset_name)
+                    archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
+                    save_path = archive_dir / asset_name
+                    if not save_path.exists():
+                        if download_asset(asset_url, save_path):
+                            new_count += 1
 
-        # 下载最新版本
-        for platform, (ver, url, name) in latest_versions.items():
-            archive_dir = ARCHIVE_DIR / platform / plugin['name'] / ver
-            save_path = archive_dir / name
-            if not save_path.exists():
-                if download_asset(url, save_path):
-                    new_count += 1
-
-    # 清理旧版本，复制最新，生成索引
     for platform in plugin['platforms']:
         platform_archive_path = ARCHIVE_DIR / platform / plugin['name']
         opkg_path = OPKG_DIR / platform / plugin['name']
