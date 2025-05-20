@@ -1,8 +1,8 @@
 {
   "plugins": [
-  {
-      "name": "passwall",
-      "repo": "xiaorouji/openwrt-passwall",
+   {
+      "name": "openclash",
+      "repo": "vernesong/OpenClash",
       "platforms": ["aarch64_cortex-a53", "x86_64"]
     }
   ]
