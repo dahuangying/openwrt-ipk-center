@@ -82,6 +82,13 @@ def generate_packages_index(opkg_plugin_path: Path):
             stdout=open(opkg_plugin_path / "Packages", "w")
         )
         log_ok(f"Generated Packages: {opkg_plugin_path/'Packages'}")
+        subprocess.run(
+            ["gzip", "-9", "-c", "Packages"],
+            cwd=opkg_plugin_path,
+            check=True,
+            stdout=open(opkg_plugin_path / "Packages.gz", "wb")
+        )
+        log_ok(f"Generated Packages.gz: {opkg_plugin_path/'Packages.gz'}")
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
