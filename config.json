@@ -1,9 +1,4 @@
 {
-  // release_type 说明：
-  // "stable"       → 只下载正式版
-  // "pre_release"  → 只下载预发布版
-  // "both"         → 同时下载正式版和预发布版
-
   "plugins": [
     {
       "name": "passwall",
