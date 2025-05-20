@@ -53,7 +53,7 @@ def clean_old_versions(base_path: Path, keep=10):
         log_clean(f"Removing old version: {old_dir}")
         shutil.rmtree(old_dir)
 
-def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=3):
+def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     versions = [d for d in platform_path.iterdir() if d.is_dir()]
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     latest = versions[:keep]
@@ -108,7 +108,7 @@ def sync_plugin(plugin):
                             new_count += 1
 
     for platform in plugin['platforms']:
-        clean_old_versions(ARCHIVE_DIR / platform / plugin['name'], keep=10)
+        clean_old_versions(ARCHIVE_DIR / platform / plugin['name'], keep=1)
 
         copy_latest_to_opkg(
             ARCHIVE_DIR / platform / plugin['name'],
