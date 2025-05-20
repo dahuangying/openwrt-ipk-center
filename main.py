@@ -7,6 +7,7 @@ import shutil
 import requests
 import subprocess
 from pathlib import Path
+from packaging import version  # 用于版本号对比
 
 # 配置
 CONFIG_FILE = "config.json"
@@ -58,12 +59,15 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     latest = versions[:keep]
 
-    # 清空 opkg path
     if opkg_path.exists():
         shutil.rmtree(opkg_path)
     for version in latest:
         target_ver = opkg_path / version.name
         shutil.copytree(version, target_ver)
+
+def extract_version(ipk_name: str) -> str:
+    match = re.search(r"_(\d[\w\.\-]*)_.*\.ipk$", ipk_name)
+    return match.group(1) if match else "0.0.0"
 
 def generate_packages_index(opkg_plugin_path: Path):
     pkg_files = list(opkg_plugin_path.glob("**/*.ipk"))
@@ -97,11 +101,9 @@ def sync_plugin(plugin):
     else:
         filtered_releases = releases
 
-    # 只处理最新 2 个 release
     filtered_releases.sort(key=lambda r: r['published_at'], reverse=True)
-    filtered_releases = filtered_releases[:2]
-
     new_count = 0
+    downloaded_versions = {}
 
     for release in filtered_releases:
         tag = release['tag_name']
@@ -110,16 +112,22 @@ def sync_plugin(plugin):
             asset_url = asset['browser_download_url']
 
             if not asset_name.endswith(".ipk"):
-                log(f"Skipping non-IPK file: {asset_name}")
                 continue
 
+            version_str = extract_version(asset_name)
             for platform in plugin['platforms']:
                 if platform in asset_name or asset_name.endswith("_all.ipk"):
-                    archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
-                    save_path = archive_dir / asset_name
-                    if not save_path.exists():
-                        if download_asset(asset_url, save_path):
-                            new_count += 1
+                    key = (platform, plugin['name'], asset_name.split('_')[0])
+                    prev_version = downloaded_versions.get(key)
+                    if not prev_version or version.parse(version_str) > version.parse(prev_version[0]):
+                        downloaded_versions[key] = (version_str, tag, asset_name, asset_url)
+
+    for (platform, plugin_name, base), (ver, tag, asset_name, asset_url) in downloaded_versions.items():
+        archive_dir = ARCHIVE_DIR / platform / plugin_name / tag
+        save_path = archive_dir / asset_name
+        if not save_path.exists():
+            if download_asset(asset_url, save_path):
+                new_count += 1
 
     for platform in plugin['platforms']:
         platform_archive_path = ARCHIVE_DIR / platform / plugin['name']
@@ -149,7 +157,6 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
                 html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
 
     html.append("</ul></body></html>")
-
     with open(index_file, "w", encoding="utf-8") as f:
         f.write("\n".join(html))
 
