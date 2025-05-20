@@ -125,8 +125,6 @@ def sync_plugin(plugin):
 
     log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
 
-# === HTML 索引生成 ===
-
 def generate_html_index(opkg_dir: Path, output_path: Path):
     output_path.mkdir(parents=True, exist_ok=True)
     index_file = output_path / "index.html"
@@ -148,8 +146,6 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     log_ok(f"Generated HTML index: {index_file}")
 
-# === 主程序 ===
-
 def main():
     if not os.path.isfile(CONFIG_FILE):
         log(f"Config file {CONFIG_FILE} not found!")
@@ -166,11 +162,9 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
-    # 生成 index.html 到 docs/opkg 下
     generate_html_index(OPKG_DIR, OPKG_DIR)
 
 if __name__ == "__main__":
     main()
-
 
 
