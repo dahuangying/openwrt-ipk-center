@@ -6,7 +6,6 @@ import json
 import shutil
 import requests
 import subprocess
-import zipfile
 from pathlib import Path
 
 # 配置
@@ -45,14 +44,6 @@ def download_asset(url, save_path):
     except Exception as e:
         log(f"Exception during download: {e}")
         return False
-
-def unzip_ipks(zip_path: Path, dest_dir: Path):
-    try:
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(dest_dir)
-        log_ok(f"Unzipped: {zip_path} to {dest_dir}")
-    except Exception as e:
-        log(f"Failed to unzip {zip_path}: {e}")
 
 def clean_old_versions(base_path: Path, keep=1):
     if not base_path.exists(): return
@@ -99,7 +90,7 @@ def generate_packages_index(opkg_plugin_path: Path):
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
-# 新增函数：判断是否是主插件ipk包，排除依赖包
+# 判断是否是主插件ipk包，排除依赖包
 def is_main_plugin_ipk(filename: str, plugin_name: str) -> bool:
     dependency_keywords = [
         'lib', 'dns2socks', 'microsocks', 'ipt2socks', 'hysteria',
@@ -145,9 +136,6 @@ def sync_plugin(plugin):
                     save_path = archive_dir / asset_name
                     if not save_path.exists():
                         if download_asset(asset_url, save_path):
-                            # 如果是zip包，自动解压ipk（理论上不会解压ipk，这里保留）
-                            if save_path.suffix == '.zip':
-                                unzip_ipks(save_path, archive_dir)
                             new_count += 1
 
     for platform in plugin['platforms']:
@@ -163,7 +151,7 @@ def sync_plugin(plugin):
 
     log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
 
-# === HTML 索引生成 ===
+# HTML 索引生成
 
 def generate_html_index(opkg_dir: Path, output_path: Path):
     output_path.mkdir(parents=True, exist_ok=True)
@@ -186,7 +174,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     log_ok(f"Generated HTML index: {index_file}")
 
-# === 主程序 ===
+# 主程序入口
 
 def main():
     if not os.path.isfile(CONFIG_FILE):
@@ -209,6 +197,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
