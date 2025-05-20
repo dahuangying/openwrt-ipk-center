@@ -89,11 +89,18 @@ def sync_plugin(plugin):
         log(f"No releases found for {plugin['name']}.")
         return
 
-    stable_releases = [r for r in releases if is_stable_version(r['tag_name'])]
-    stable_releases.sort(key=lambda r: r['published_at'], reverse=True)
+    release_type = plugin.get("release_type", "stable")
+    if release_type == "stable":
+        selected_releases = [r for r in releases if is_stable_version(r['tag_name'])]
+    elif release_type == "pre_release":
+        selected_releases = [r for r in releases if not is_stable_version(r['tag_name'])]
+    else:  # both
+        selected_releases = releases
+
+    selected_releases.sort(key=lambda r: r['published_at'], reverse=True)
     new_count = 0
 
-    for release in stable_releases:
+    for release in selected_releases:
         tag = release['tag_name']
         for asset in release.get('assets', []):
             asset_name = asset['name']
@@ -166,6 +173,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
