@@ -120,15 +120,15 @@ def sync_plugin(plugin):
                             new_count += 1
 
     for platform in plugin['platforms']:
-        clean_old_versions(ARCHIVE_DIR / platform / plugin['name'], keep=1)
+        platform_archive_path = ARCHIVE_DIR / platform / plugin['name']
+        opkg_path = OPKG_DIR / platform / plugin['name']
 
-        copy_latest_to_opkg(
-            ARCHIVE_DIR / platform / plugin['name'],
-            OPKG_DIR / platform / plugin['name'],
-            keep=3
-        )
-
-        generate_packages_index(OPKG_DIR / platform / plugin['name'])
+        if platform_archive_path.exists():
+            clean_old_versions(platform_archive_path, keep=1)
+            copy_latest_to_opkg(platform_archive_path, opkg_path, keep=1)
+            generate_packages_index(opkg_path)
+        else:
+            log(f"Directory not found, skipping copy and index generation: {platform_archive_path}")
 
     log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
 
@@ -173,6 +173,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
