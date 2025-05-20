@@ -54,6 +54,9 @@ def clean_old_versions(base_path: Path, keep=1):
         shutil.rmtree(old_dir)
 
 def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
+    if not platform_path.exists():
+        log(f"Directory not exists, skip copying: {platform_path}")
+        return
     versions = [d for d in platform_path.iterdir() if d.is_dir()]
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     latest = versions[:keep]
@@ -173,6 +176,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
