@@ -45,7 +45,7 @@ def download_asset(url, save_path):
         log(f"Exception during download: {e}")
         return False
 
-def clean_old_versions(base_path: Path, keep=10):
+def clean_old_versions(base_path: Path, keep=1):
     if not base_path.exists(): return
     versions = [d for d in base_path.iterdir() if d.is_dir()]
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
@@ -53,7 +53,7 @@ def clean_old_versions(base_path: Path, keep=10):
         log_clean(f"Removing old version: {old_dir}")
         shutil.rmtree(old_dir)
 
-def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=3):
+def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     versions = [d for d in platform_path.iterdir() if d.is_dir()]
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     latest = versions[:keep]
