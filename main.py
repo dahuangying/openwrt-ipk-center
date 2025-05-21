@@ -97,9 +97,12 @@ def sync_plugin(plugin):
     else:
         filtered_releases = releases
 
-    # 只处理最新 2 个 release
-    filtered_releases.sort(key=lambda r: r['published_at'], reverse=True)
-    filtered_releases = filtered_releases[:2]
+    # 只处理发布时间最新的 release
+    latest_release = max(filtered_releases, key=lambda r: r['published_at'], default=None)
+    if not latest_release:
+        log(f"No suitable release found for {plugin['name']}")
+        return
+    filtered_releases = [latest_release]
 
     new_count = 0
 
