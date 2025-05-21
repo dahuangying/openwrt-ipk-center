@@ -1,0 +1,33 @@
+config.json 配置说明：
+
+1. release_type 说明：
+   - "stable"      → 只下载正式版（推荐用于生产环境）
+   - "pre_release" → 只下载预发布版（测试版，可能不稳定）
+   - "both"        → 同时下载正式版和预发布版（适合开发测试）
+
+2. plugins 字段说明：
+   - name：插件名称，用于本地目录命名
+   - repo：GitHub 仓库地址，格式为 "用户名/仓库名"
+   - platforms：支持的平台列表，如 "aarch64_cortex-a53", "aarch64_generic", "x86_64"
+   - release_type：下载版本类型（见第1点）
+
+3. 支持的平台示例：
+   - aarch64_cortex-a53 ：常见于树莓派3、斐讯 R2S 等设备
+   - aarch64_generic     ：更通用的 64 位 ARM 平台，适合多种 ARM 设备
+   - x86_64              ：x86 架构设备，常见软路由或PC
+
+4. 注意事项：
+   - platforms 字段中的平台名需与插件发布的 IPK 包文件名对应，否则无法下载对应版本。
+   - 配置文件必须是标准 JSON 格式，不允许带注释。
+
+示例配置：
+{
+  "plugins": [
+    {
+      "name": "passwall",
+      "repo": "xiaorouji/openwrt-passwall",
+      "platforms": ["aarch64_cortex-a53", "aarch64_generic", "x86_64"],
+      "release_type": "stable"
+    }
+  ]
+}
