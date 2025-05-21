@@ -9,6 +9,7 @@ import subprocess
 from pathlib import Path
 
 # 配置
+CONFIG_FILE = "config.json"
 ARCHIVE_DIR = Path("archive")
 OPKG_DIR = Path("opkg")
 DOCS_DIR = Path(".")  # 输出 index.html 到根目录
