@@ -10,9 +10,9 @@ from pathlib import Path
 
 # 配置
 CONFIG_FILE = "config.json"
-ARCHIVE_DIR = Path("archive")
-OPKG_DIR = Path("opkg")
-DOCS_DIR = Path(".")  # 输出 index.html 到根目录
+ARCHIVE_DIR = Path("docs/archive")
+OPKG_DIR = Path("docs/opkg")
+DOCS_DIR = Path("docs")  # 用来存放 index.html
 
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
@@ -97,39 +97,32 @@ def sync_plugin(plugin):
     else:
         filtered_releases = releases
 
-    # 排序：先按发布时间，再尝试 tag_name 最大的
-    releases_by_time = sorted(filtered_releases, key=lambda r: r['published_at'], reverse=True)
-    releases_by_tag = sorted(filtered_releases, key=lambda r: r['tag_name'], reverse=True)
+    # 只处理发布时间最新的 release
+    latest_release = max(filtered_releases, key=lambda r: r['published_at'], default=None)
+    if not latest_release:
+        log(f"No suitable release found for {plugin['name']}")
+        return
+    filtered_releases = [latest_release]
 
     new_count = 0
-    found = False
 
-    for release_list in [releases_by_time, releases_by_tag]:
-        for release in release_list:
-            tag = release['tag_name']
-            ipk_assets = [a for a in release.get("assets", []) if a['name'].endswith(".ipk")]
-            if not ipk_assets:
+    for release in filtered_releases:
+        tag = release['tag_name']
+        for asset in release.get('assets', []):
+            asset_name = asset['name']
+            asset_url = asset['browser_download_url']
+
+            if not asset_name.endswith(".ipk"):
+                log(f"Skipping non-IPK file: {asset_name}")
                 continue
 
-            found = True
-            for asset in ipk_assets:
-                asset_name = asset['name']
-                asset_url = asset['browser_download_url']
-
-                for platform in plugin['platforms']:
-                    if platform in asset_name or asset_name.endswith("_all.ipk"):
-                        archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
-                        save_path = archive_dir / asset_name
-                        if not save_path.exists():
-                            if download_asset(asset_url, save_path):
-                                new_count += 1
-            break
-        if found:
-            break
-
-    if not found:
-        log(f"No IPK found in latest or highest versioned release for {plugin['name']}")
-        return
+            for platform in plugin['platforms']:
+                if platform in asset_name or asset_name.endswith("_all.ipk"):
+                    archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
+                    save_path = archive_dir / asset_name
+                    if not save_path.exists():
+                        if download_asset(asset_url, save_path):
+                            new_count += 1
 
     for platform in plugin['platforms']:
         platform_archive_path = ARCHIVE_DIR / platform / plugin['name']
@@ -181,10 +174,11 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
-    generate_html_index(OPKG_DIR, DOCS_DIR)
+    generate_html_index(OPKG_DIR, OPKG_DIR)
 
 if __name__ == "__main__":
     main()
+
 
 
 
