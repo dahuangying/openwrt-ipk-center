@@ -9,10 +9,9 @@ import subprocess
 from pathlib import Path
 
 # 配置
-CONFIG_FILE = "config.json"
-ARCHIVE_DIR = Path("archive")   
-OPKG_DIR = Path("opkg")          
-DOCS_DIR = Path(".")        # 主页index.html生成在根目录
+ARCHIVE_DIR = Path("archive")
+OPKG_DIR = Path("opkg")
+DOCS_DIR = Path(".")  # 输出 index.html 到根目录
 
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
