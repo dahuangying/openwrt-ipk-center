@@ -181,7 +181,7 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
-    generate_html_index(OPKG_DIR, OPKG_DIR)
+    generate_html_index(OPKG_DIR, DOCS_DIR)
 
 if __name__ == "__main__":
     main()
