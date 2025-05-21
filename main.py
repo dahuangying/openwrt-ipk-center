@@ -155,8 +155,8 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     for platform_dir in sorted(opkg_dir.glob("*")):
         for plugin_dir in sorted(platform_dir.glob("*")):
             for version_dir in sorted(plugin_dir.glob("*")):
-                rel_path = f"{platform_dir.name}/{plugin_dir.name}/{version_dir.name}"
-                html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
+                rel_path = f"opkg/{platform_dir.name}/{plugin_dir.name}/{version_dir.name}"
+                html.append(f"<li><a href='/openwrt-ipk-center/{rel_path}/'>{rel_path}</a></li>")
 
     html.append("</ul></body></html>")
 
