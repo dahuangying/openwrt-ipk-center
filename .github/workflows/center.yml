@@ -29,7 +29,7 @@ jobs:
         run: python main.py
 
       - name: List docs directory
-        run: ls -la ./docs
+        run: ls -la .
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
