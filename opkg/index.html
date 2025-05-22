@@ -4,33 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpenWrt IPK Center</title>
-    
     <!-- 引入样式文件 -->
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
     <div class="container">
+        <!-- Header: 显示标题和搜索框 -->
         <header>
             <h1>OpenWrt IPK Center</h1>
+            <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchFunction()">
         </header>
+        
+        <!-- 主体内容 -->
         <main>
-            <ul class="ipk-list">
-                <li><a href="aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk</a></li>
-                <li><a href="aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</a></li>
-                <li><a href="aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</a></li>
-                <li><a href="aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</a></li>
-                <li><a href="aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</a></li>
-                <li><a href="aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</a></li>
-                <li><a href="aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</a></li>
-                <li><a href="aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</a></li>
-                <li><a href="aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk</a></li>
-                <!-- 更多插件链接 -->
+            <!-- 插件目录结构 -->
+            <ul class="directory-list">
+                <!-- 每个平台和插件都会是一个 <li> -->
+                <li class="directory">
+                    <span class="folder-name">aarch64_cortex-a53</span>
+                    <ul class="file-list">
+                        <li><a href="opkg/aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">luci-app-openclash_0.46.079_all.ipk</a></li>
+                        <li><a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">luci-app-passwall_25.5.16-1_all.ipk</a></li>
+                    </ul>
+                </li>
+                <li class="directory">
+                    <span class="folder-name">x86_64</span>
+                    <ul class="file-list">
+                        <li><a href="opkg/x86_64/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">luci-app-openclash_0.46.079_all.ipk</a></li>
+                        <li><a href="opkg/x86_64/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">luci-app-passwall_25.5.16-1_all.ipk</a></li>
+                    </ul>
+                </li>
+                <!-- 继续添加其他平台和插件 -->
             </ul>
         </main>
+
+        <!-- Footer: 页脚信息 -->
         <footer>
             <p>OpenWrt IPK Center - Created by [Your Name]</p>
         </footer>
     </div>
+
+    <!-- 引入搜索功能脚本 -->
+    <script src="search.js"></script>
 </body>
 </html>
 
