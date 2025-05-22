@@ -61,12 +61,14 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     # 清空 opkg path
     if opkg_path.exists():
         shutil.rmtree(opkg_path)
+
     for version in latest:
         target_ver = opkg_path / version.name
         shutil.copytree(version, target_ver)
+        generate_packages_index(target_ver)  # 👈 在版本目录中生成 Packages
 
 def generate_packages_index(opkg_plugin_path: Path):
-    pkg_files = list(opkg_plugin_path.glob("**/*.ipk"))
+    pkg_files = list(opkg_plugin_path.glob("*.ipk"))
     if not pkg_files:
         log(f"No IPK files to generate Packages at {opkg_plugin_path}")
         return
@@ -78,7 +80,12 @@ def generate_packages_index(opkg_plugin_path: Path):
             check=True,
             stdout=open(opkg_plugin_path / "Packages", "w")
         )
-        log_ok(f"Generated Packages: {opkg_plugin_path/'Packages'}")
+        subprocess.run(
+            ["gzip", "-kf", "Packages"],
+            cwd=opkg_plugin_path,
+            check=True
+        )
+        log_ok(f"Generated Packages and Packages.gz in {opkg_plugin_path}")
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
@@ -138,7 +145,6 @@ def sync_plugin(plugin):
         if platform_archive_path.exists():
             clean_old_versions(platform_archive_path, keep=1)
             copy_latest_to_opkg(platform_archive_path, opkg_path, keep=1)
-            generate_packages_index(opkg_path)
         else:
             log(f"Directory not found, skipping copy and index generation: {platform_archive_path}")
 
@@ -185,6 +191,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
