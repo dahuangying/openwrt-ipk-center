@@ -1,13 +1,36 @@
-function searchPackages() {
-    const query = document.getElementById('search').value.toLowerCase();
-    const links = document.querySelectorAll('.ipk-list li a');
+document.getElementById('search-input').addEventListener('input', function(event) {
+    const searchTerm = event.target.value.toLowerCase();
+    const listItems = document.querySelectorAll('.ipk-list li');
     
-    links.forEach(link => {
-        const text = link.textContent.toLowerCase();
-        if (text.includes(query)) {
-            link.parentElement.style.display = 'block'; // 显示匹配的条目
+    listItems.forEach(function(item) {
+        const linkText = item.textContent.toLowerCase();
+        if (linkText.includes(searchTerm)) {
+            item.style.display = 'block';
         } else {
-            link.parentElement.style.display = 'none'; // 隐藏不匹配的条目
+            item.style.display = 'none';
         }
     });
+});
+
+function showPlugins(platform) {
+    const pluginList = document.getElementById('plugin-list');
+    pluginList.innerHTML = ''; // 清空插件列表
+
+    // 加载相应平台的插件
+    fetch(`opkg/${platform}/`)
+        .then(response => response.json())
+        .then(plugins => {
+            plugins.forEach(plugin => {
+                const li = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = plugin.url;
+                link.textContent = plugin.name;
+                li.appendChild(link);
+                pluginList.appendChild(li);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading plugins:', error);
+        });
 }
+
