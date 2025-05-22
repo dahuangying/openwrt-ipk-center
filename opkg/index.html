@@ -4,48 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpenWrt IPK Center</title>
+    
     <!-- 引入样式文件 -->
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="assets/style.css">
+
+    <!-- 引入搜索功能的 JavaScript -->
+    <script src="assets/search.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Header: 显示标题和搜索框 -->
         <header>
             <h1>OpenWrt IPK Center</h1>
-            <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchFunction()">
         </header>
-        
-        <!-- 主体内容 -->
         <main>
-            <!-- 插件目录结构 -->
-            <ul class="directory-list">
-                <!-- 每个平台和插件都会是一个 <li> -->
-                <li class="directory">
-                    <span class="folder-name">aarch64_cortex-a53</span>
-                    <ul class="file-list">
-                        <li><a href="opkg/aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">luci-app-openclash_0.46.079_all.ipk</a></li>
-                        <li><a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">luci-app-passwall_25.5.16-1_all.ipk</a></li>
-                    </ul>
-                </li>
-                <li class="directory">
-                    <span class="folder-name">x86_64</span>
-                    <ul class="file-list">
-                        <li><a href="opkg/x86_64/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">luci-app-openclash_0.46.079_all.ipk</a></li>
-                        <li><a href="opkg/x86_64/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">luci-app-passwall_25.5.16-1_all.ipk</a></li>
-                    </ul>
-                </li>
-                <!-- 继续添加其他平台和插件 -->
+            <input type="text" id="search" placeholder="Search for packages..." oninput="searchPackages()">
+            <ul class="ipk-list">
+                <!-- 自动生成的插件链接会在这里填充 -->
+                <li><a href="opkg/aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">opkg/aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk</a></li>
+                <li><a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</a></li>
+                <!-- 更多插件链接 -->
             </ul>
         </main>
-
-        <!-- Footer: 页脚信息 -->
         <footer>
             <p>OpenWrt IPK Center - Created by [Your Name]</p>
         </footer>
     </div>
-
-    <!-- 引入搜索功能脚本 -->
-    <script src="search.js"></script>
 </body>
 </html>
+
 
