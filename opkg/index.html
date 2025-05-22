@@ -7,29 +7,41 @@
     
     <!-- 引入样式文件 -->
     <link rel="stylesheet" type="text/css" href="assets/style.css">
-
-    <!-- 引入搜索功能的 JavaScript -->
-    <script src="assets/search.js"></script>
+    
+    <!-- 引入搜索脚本 -->
+    <script src="assets/search.js" defer></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>OpenWrt IPK Center</h1>
+            <h1>OpenWrt插件集</h1>
         </header>
+
         <main>
-            <input type="text" id="search" placeholder="Search for packages..." oninput="searchPackages()">
-            <ul class="ipk-list">
+            <!-- 搜索框 -->
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Type to search...">
+            </div>
+
+            <!-- 三个平台选择 -->
+            <div class="platforms">
+                <button onclick="showPlugins('aarch64_cortex-a53')">aarch64_cortex-a53</button>
+                <button onclick="showPlugins('aarch64_generic')">aarch64_generic</button>
+                <button onclick="showPlugins('x86_64')">x86_64</button>
+            </div>
+
+            <!-- 插件列表（动态生成） -->
+            <ul class="ipk-list" id="plugin-list">
                 <!-- 自动生成的插件链接会在这里填充 -->
-                <li><a href="opkg/aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">opkg/aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk</a></li>
-                <li><a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</a></li>
-                <!-- 更多插件链接 -->
             </ul>
         </main>
+
         <footer>
             <p>OpenWrt IPK Center - Created by [Your Name]</p>
         </footer>
     </div>
 </body>
 </html>
+
 
 
