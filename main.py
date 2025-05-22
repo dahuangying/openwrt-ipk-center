@@ -80,12 +80,13 @@ def generate_packages_index(opkg_plugin_path: Path):
             check=True,
             stdout=open(opkg_plugin_path / "Packages", "w")
         )
-        subprocess.run(
-            ["gzip", "-kf", "Packages"],
-            cwd=opkg_plugin_path,
-            check=True
-        )
-        log_ok(f"Generated Packages and Packages.gz in {opkg_plugin_path}")
+        # 不生成 Packages.gz，下面代码注释掉
+        # subprocess.run(
+        #     ["gzip", "-kf", "Packages"],
+        #     cwd=opkg_plugin_path,
+        #     check=True
+        # )
+        log_ok(f"Generated Packages in {opkg_plugin_path}")
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
@@ -191,6 +192,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
