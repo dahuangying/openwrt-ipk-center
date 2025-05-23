@@ -11,8 +11,8 @@ from pathlib import Path
 # 配置
 CONFIG_FILE = "config.json"
 ARCHIVE_DIR = Path("archive")
-OPKG_DIR = Path("dopkg")
-DOCS_DIR = Path(".")  # 用来存放 index.html
+OPKG_DIR = Path("opkg")           # ✅ 改为 "opkg"
+DOCS_DIR = Path(".")              # 用来存放 index.html
 
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
@@ -58,14 +58,13 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     latest = versions[:keep]
 
-    # 清空 opkg path
     if opkg_path.exists():
         shutil.rmtree(opkg_path)
 
     for version in latest:
         target_ver = opkg_path / version.name
         shutil.copytree(version, target_ver)
-        generate_packages_index(target_ver)  # 👈 在版本目录中生成 Packages
+        generate_packages_index(target_ver)
 
 def generate_packages_index(opkg_plugin_path: Path):
     pkg_files = list(opkg_plugin_path.glob("*.ipk"))
@@ -99,7 +98,6 @@ def sync_plugin(plugin):
     else:
         filtered_releases = releases
 
-    # 排序：先按发布时间，再尝试 tag_name 最大的
     releases_by_time = sorted(filtered_releases, key=lambda r: r['published_at'], reverse=True)
     releases_by_tag = sorted(filtered_releases, key=lambda r: r['tag_name'], reverse=True)
 
@@ -184,10 +182,16 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
-    generate_html_index(OPKG_DIR, OPKG_DIR)
+    # ✅ 生成 HTML 到根目录
+    generate_html_index(OPKG_DIR, Path("."))
+
+    # ✅ 创建 .nojekyll
+    Path(".nojekyll").touch()
+    log_ok("Created .nojekyll")
 
 if __name__ == "__main__":
     main()
+
 
 
 
