@@ -28,28 +28,16 @@ jobs:
       - name: Run sync script
         run: python main.py
 
-      - name: List docs directory
-        run: ls -la ./docs
+      - name: Prepare publish directory
+        run: |
+          mkdir publish
+          cp -r archive opkg index.html .nojekyll publish/
+
+      - name: List publish directory
+        run: ls -la ./publish
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
-          exclude: ''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          publish_dir: ./publish
