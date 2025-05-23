@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 获取完整历史记录，便于gh-pages部署
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -24,19 +26,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests
+          sudo apt-get update
+          sudo apt-get install -y ipkg-utils  # 确保ipkg-make-index可用
 
       - name: Run sync script
         run: python main.py
 
-      - name: List docs directory
-        run: ls -la ./docs
+      - name: List dist directory
+        run: ls -la ./dist  # 改为检查dist目录
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
-          exclude: ''
+          publish_dir: ./dist  # 改为发布dist目录
+          destination_dir: .   # 确保部署到gh-pages根目录
+          keep_files: false    # 清理旧文件
+          force_orphan: true   # 强制使用孤立历史
 
 
 
