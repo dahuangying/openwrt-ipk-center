@@ -44,8 +44,12 @@ jobs:
           echo "Starting sync script"
           python main.py
 
-      - name: List docs directory
-        run: ls -la ./docs
+      - name: Debug directory and files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "List of files in the current directory:"
+          ls -la
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -53,6 +57,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           exclude: ''
+
 
 
 
