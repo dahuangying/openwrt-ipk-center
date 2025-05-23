@@ -73,15 +73,25 @@ def generate_packages_index(opkg_plugin_path: Path):
         return
 
     try:
-        subprocess.run(
-            ["ipkg-make-index", "."],
-            cwd=opkg_plugin_path,
-            check=True,
-            stdout=open(opkg_plugin_path / "Packages", "w")
-        )
+        # 方法1：使用subprocess.run直接写入文件（兼容性更好）
+        with open(opkg_plugin_path / "Packages", "w") as f:
+            subprocess.run(
+                ["ipkg-make-index", "."],
+                cwd=opkg_plugin_path,
+                check=True,
+                stdout=f,
+                stderr=subprocess.PIPE
+            )
+        
+        # 方法2：如果方法1失败，尝试shell重定向（备用方案）
+        if not (opkg_plugin_path / "Packages").exists() or os.path.getsize(opkg_plugin_path / "Packages") == 0:
+            os.system(f"cd {opkg_plugin_path} && ipkg-make-index . > Packages 2> /dev/null")
+        
         log_ok(f"Generated Packages in {opkg_plugin_path}")
+    except subprocess.CalledProcessError as e:
+        log(f"Failed to generate Packages (exit code {e.returncode}): {e.stderr.decode().strip()}")
     except Exception as e:
-        log(f"Failed to generate Packages: {e}")
+        log(f"Unexpected error in generate_packages_index: {str(e)}")
 
 def sync_plugin(plugin):
     log(f"Syncing {plugin['name']}...")
