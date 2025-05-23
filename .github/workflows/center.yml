@@ -22,37 +22,21 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # 从OpenWrt官方源安装正确版本的ipkg-utils
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget https://downloads.openwrt.org/releases/22.03.0/targets/x86/64/packages/Packages.gz
-          gunzip Packages.gz
-          package_url=$(grep -A 10 "Package: ipkg-utils" Packages | grep "Filename:" | cut -d' ' -f2)
-          wget https://downloads.openwrt.org/releases/22.03.0/targets/x86/64/packages/${package_url}
-          sudo dpkg -i --force-depends ipkg-utils_*_x86_64.ipk
-          
           python -m pip install --upgrade pip
           pip install requests
-
-      - name: Prepare directories
-        run: |
-          mkdir -p archive dist/opkg
-          ls -la
 
       - name: Run sync script
         run: python main.py
 
-      - name: Verify artifacts
-        run: |
-          ls -la ./dist
-          [ -f ./dist/.nojekyll ] || { echo ".nojekyll missing!"; exit 1; }
+      - name: List docs directory
+        run: ls -la ./docs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          force_orphan: true
+          publish_dir: ./docs
+          exclude: ''
 
 
 
