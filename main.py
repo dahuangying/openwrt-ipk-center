@@ -94,15 +94,25 @@ def generate_packages_index(opkg_plugin_path: Path):
         )
         log_ok(f"Generated Packages in {opkg_plugin_path}")
 
-        # 生成 Packages.gz 文件
+        # 检查 Packages 文件是否为空
         packages_file = opkg_plugin_path / "Packages"
+        if os.stat(packages_file).st_size == 0:
+            log("[ERROR] Packages file is empty.")
+            return
+
+        # 生成 Packages.gz 文件
         packages_gz_file = opkg_plugin_path / "Packages.gz"
         
+        log(f"Starting gzip compression for {packages_file} into {packages_gz_file}...")
         with open(packages_file, "rb") as f_in:
             with gzip.open(packages_gz_file, "wb") as f_out:
                 f_out.writelines(f_in)
         
-        log_ok(f"Generated Packages.gz in {opkg_plugin_path}")
+        # 确认 Packages.gz 是否成功生成
+        if packages_gz_file.exists():
+            log_ok(f"Generated Packages.gz in {opkg_plugin_path}")
+        else:
+            log(f"[ERROR] Failed to generate Packages.gz in {opkg_plugin_path}")
     
     except Exception as e:
         log(f"Failed to generate Packages or Packages.gz: {e}")
@@ -214,6 +224,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
