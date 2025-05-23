@@ -25,9 +25,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
           sudo apt-get update && sudo apt-get install -y gzip  # 安装 gzip
+          gzip --version  # 确认 gzip 安装成功
 
       - name: Run sync script
-        run: python main.py
+        run: |
+          echo "Starting sync script"
+          python main.py
 
       - name: List docs directory
         run: ls -la ./docs
