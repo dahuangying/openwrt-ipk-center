@@ -10,9 +10,9 @@ from pathlib import Path
 
 # 配置
 CONFIG_FILE = "config.json"
-ARCHIVE_DIR = Path("archive")      # 修改为根目录下的archive
-OPKG_DIR = Path("dist/opkg")      # 修改输出到dist/opkg
-DOCS_DIR = Path("dist")           # 主输出目录改为dist
+ARCHIVE_DIR = Path("archive")      # 存档目录改为根目录下archive
+OPKG_DIR = Path("dist/opkg")      # OPKG输出改为dist/opkg
+DOCS_DIR = Path("dist")            # 主输出目录改为dist
 
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
