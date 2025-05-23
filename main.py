@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 
 import os
 import re
 import sys
@@ -73,13 +73,16 @@ def generate_packages_index(opkg_plugin_path: Path):
         return
 
     try:
-        subprocess.run(
-            ["ipkg-make-index", "."],
-            cwd=opkg_plugin_path,
-            check=True,
-            stdout=open(opkg_plugin_path / "Packages", "w")
-        )
+        output_path = opkg_plugin_path / "Packages"
+        with open(output_path, "w") as f:
+            subprocess.run(
+                ["ipkg-make-index", "."],
+                cwd=opkg_plugin_path,
+                check=True,
+                stdout=f
+            )
         log_ok(f"Generated Packages in {opkg_plugin_path}")
+        log(f"Packages file size: {output_path.stat().st_size} bytes")  # ✅ Debug 输出文件大小
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
