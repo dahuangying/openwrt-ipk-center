@@ -19,6 +19,16 @@ def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
 def log_clean(msg): print(f"[CLEAN] {msg}")
 
+# 检查 gzip 是否安装
+def check_gzip_installed():
+    try:
+        # 使用 subprocess 来检查 gzip 是否安装
+        subprocess.run(["gzip", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        log_ok("gzip is installed.")
+    except subprocess.CalledProcessError:
+        log("[ERROR] gzip is not installed. Please install gzip to continue.")
+        sys.exit(1)
+
 def is_stable_version(tag_name: str) -> bool:
     unstable_keywords = ['beta', 'rc', 'alpha', 'test', 'dev']
     return not any(k in tag_name.lower() for k in unstable_keywords)
@@ -182,6 +192,9 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     log_ok(f"Generated HTML index: {index_file}")
 
 def main():
+    # 检查 gzip 是否安装
+    check_gzip_installed()
+
     if not os.path.isfile(CONFIG_FILE):
         log(f"Config file {CONFIG_FILE} not found!")
         sys.exit(1)
@@ -201,6 +214,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
