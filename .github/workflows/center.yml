@@ -24,32 +24,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests
-          sudo apt-get update
-          sudo apt-get install -y gzip  # 安装 gzip
-          which gzip  # 确认 gzip 安装路径
-          gzip --version  # 确认 gzip 版本
-
-      - name: Check gzip installation
-        run: |
-          echo "Checking gzip availability..."
-          if ! command -v gzip &> /dev/null; then
-            echo "gzip could not be found, exiting."
-            exit 1
-          else
-            echo "gzip is available."
-          fi
 
       - name: Run sync script
-        run: |
-          echo "Starting sync script"
-          python main.py
+        run: python main.py
 
-      - name: Debug directory and files
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "List of files in the current directory:"
-          ls -la
+      - name: List docs directory
+        run: ls -la ./docs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
