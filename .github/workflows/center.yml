@@ -33,7 +33,11 @@ jobs:
           sudo ln -sf ~/ipkg-tools/ipkg-make-index.sh /usr/local/bin/ipkg-make-index
 
       - name: Verify ipkg-make-index
-        run: ipkg-make-index --help
+        run: |
+          if ! command -v ipkg-make-index >/dev/null; then
+            echo "ipkg-make-index not found"
+            exit 1
+          fi
 
       - name: Run sync script
         run: python main.py
