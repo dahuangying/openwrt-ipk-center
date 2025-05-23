@@ -10,9 +10,9 @@ from pathlib import Path
 
 # 配置
 CONFIG_FILE = "config.json"
-ARCHIVE_DIR = Path("docs/archive")
-OPKG_DIR = Path("docs/opkg")
-DOCS_DIR = Path("docs")  # 用来存放 index.html
+ARCHIVE_DIR = Path("archive")      # 修改为根目录下的archive
+OPKG_DIR = Path("dist/opkg")      # 修改输出到dist/opkg
+DOCS_DIR = Path("dist")           # 主输出目录改为dist
 
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
@@ -147,6 +147,11 @@ def sync_plugin(plugin):
 def generate_html_index(opkg_dir: Path, output_path: Path):
     output_path.mkdir(parents=True, exist_ok=True)
     index_file = output_path / "index.html"
+    
+    # 添加.nojekyll文件
+    nojekyll_file = output_path / ".nojekyll"
+    with open(nojekyll_file, "w") as f:
+        f.write("")
 
     html = ["<html><head><meta charset='utf-8'><title>OpenWrt IPK Center</title></head><body>"]
     html.append("<h1>OpenWrt IPK Center</h1>")
@@ -154,9 +159,8 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     for platform_dir in sorted(opkg_dir.glob("*")):
         for plugin_dir in sorted(platform_dir.glob("*")):
-            for version_dir in sorted(plugin_dir.glob("*")):
-                rel_path = f"{platform_dir.name}/{plugin_dir.name}/{version_dir.name}"
-                html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
+            rel_path = f"opkg/{platform_dir.name}/{plugin_dir.name}"  # 修改路径前缀
+            html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
 
     html.append("</ul></body></html>")
 
@@ -164,6 +168,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
         f.write("\n".join(html))
 
     log_ok(f"Generated HTML index: {index_file}")
+    log_ok(f"Added .nojekyll file: {nojekyll_file}")
 
 def main():
     if not os.path.isfile(CONFIG_FILE):
@@ -178,10 +183,15 @@ def main():
         log("No plugins configured.")
         return
 
+    # 清空dist目录
+    if DOCS_DIR.exists():
+        shutil.rmtree(DOCS_DIR)
+    DOCS_DIR.mkdir(parents=True)
+
     for plugin in plugins:
         sync_plugin(plugin)
 
-    generate_html_index(OPKG_DIR, OPKG_DIR)
+    generate_html_index(OPKG_DIR, DOCS_DIR)
 
 if __name__ == "__main__":
     main()
