@@ -6,6 +6,7 @@ import json
 import shutil
 import requests
 import subprocess
+import gzip
 from pathlib import Path
 
 # 配置
@@ -74,6 +75,7 @@ def generate_packages_index(opkg_plugin_path: Path):
         return
 
     try:
+        # 生成 Packages 文件
         subprocess.run(
             ["ipkg-make-index", "."],
             cwd=opkg_plugin_path,
@@ -81,8 +83,19 @@ def generate_packages_index(opkg_plugin_path: Path):
             stdout=open(opkg_plugin_path / "Packages", "w")
         )
         log_ok(f"Generated Packages in {opkg_plugin_path}")
+
+        # 生成 Packages.gz 文件
+        packages_file = opkg_plugin_path / "Packages"
+        packages_gz_file = opkg_plugin_path / "Packages.gz"
+        
+        with open(packages_file, "rb") as f_in:
+            with gzip.open(packages_gz_file, "wb") as f_out:
+                f_out.writelines(f_in)
+        
+        log_ok(f"Generated Packages.gz in {opkg_plugin_path}")
+    
     except Exception as e:
-        log(f"Failed to generate Packages: {e}")
+        log(f"Failed to generate Packages or Packages.gz: {e}")
 
 def sync_plugin(plugin):
     log(f"Syncing {plugin['name']}...")
@@ -188,6 +201,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
