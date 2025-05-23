@@ -86,6 +86,7 @@ def generate_packages_index(opkg_plugin_path: Path):
 
     try:
         # 生成 Packages 文件
+        log(f"Running ipkg-make-index in {opkg_plugin_path}...")
         subprocess.run(
             ["ipkg-make-index", "."],
             cwd=opkg_plugin_path,
@@ -97,8 +98,11 @@ def generate_packages_index(opkg_plugin_path: Path):
         # 检查 Packages 文件是否为空
         packages_file = opkg_plugin_path / "Packages"
         if os.stat(packages_file).st_size == 0:
-            log("[ERROR] Packages file is empty.")
+            log(f"[ERROR] Packages file is empty.")
             return
+
+        # 输出 Packages 文件内容大小
+        log(f"Packages file size: {os.stat(packages_file).st_size} bytes")
 
         # 生成 Packages.gz 文件
         packages_gz_file = opkg_plugin_path / "Packages.gz"
@@ -107,7 +111,7 @@ def generate_packages_index(opkg_plugin_path: Path):
         with open(packages_file, "rb") as f_in:
             with gzip.open(packages_gz_file, "wb") as f_out:
                 f_out.writelines(f_in)
-        
+
         # 确认 Packages.gz 是否成功生成
         if packages_gz_file.exists():
             log_ok(f"Generated Packages.gz in {opkg_plugin_path}")
