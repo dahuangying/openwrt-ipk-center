@@ -7,6 +7,7 @@ import shutil
 import requests
 import subprocess
 from pathlib import Path
+import tarfile
 
 # 配置
 CONFIG_FILE = "config.json"
@@ -66,23 +67,68 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
         shutil.copytree(version, target_ver)
         generate_packages_index(target_ver)
 
+def parse_control_from_ipk(ipk_path: Path) -> str:
+    """
+    从 ipk 文件中提取控制信息部分，返回字符串格式
+    ipk 文件是一个 ar 存档，里面有 control.tar.gz 或 control.tar.xz
+    """
+    try:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+            # ipk 是 ar 格式，可以用 system 命令ar提取
+            # 先提取 control.tar.*
+            subprocess.run(["ar", "x", str(ipk_path)], cwd=tmpdir, check=True)
+            # 找 control.tar.gz 或 control.tar.xz
+            control_tar = None
+            for name in ["control.tar.gz", "control.tar.xz", "control.tar.bz2"]:
+                candidate = tmpdir_path / name
+                if candidate.exists():
+                    control_tar = candidate
+                    break
+            if control_tar is None:
+                log(f"No control.tar.* found in {ipk_path}")
+                return ""
+
+            # 解压control.tar.*
+            control_dir = tmpdir_path / "control"
+            control_dir.mkdir()
+            if control_tar.suffixes[-2:] == ['.tar', '.gz']:
+                mode = "r:gz"
+            elif control_tar.suffixes[-2:] == ['.tar', '.xz']:
+                mode = "r:xz"
+            elif control_tar.suffixes[-2:] == ['.tar', '.bz2']:
+                mode = "r:bz2"
+            else:
+                mode = "r:*"
+            with tarfile.open(control_tar, mode) as tar:
+                tar.extractall(path=control_dir)
+            control_file = control_dir / "control"
+            if control_file.exists():
+                return control_file.read_text(encoding="utf-8")
+            else:
+                log(f"control file not found inside {control_tar}")
+                return ""
+    except Exception as e:
+        log(f"Error parsing control from {ipk_path}: {e}")
+        return ""
+
 def generate_packages_index(opkg_plugin_path: Path):
     pkg_files = list(opkg_plugin_path.glob("*.ipk"))
     if not pkg_files:
         log(f"No IPK files to generate Packages at {opkg_plugin_path}")
         return
 
+    output_path = opkg_plugin_path / "Packages"
     try:
-        output_path = opkg_plugin_path / "Packages"
-        with open(output_path, "w") as f:
-            subprocess.run(
-                ["ipkg-make-index", "."],
-                cwd=opkg_plugin_path,
-                check=True,
-                stdout=f
-            )
+        with open(output_path, "w", encoding="utf-8") as f:
+            for ipk in pkg_files:
+                control = parse_control_from_ipk(ipk)
+                if control:
+                    f.write(control.strip())
+                    f.write("\n\n")
         log_ok(f"Generated Packages in {opkg_plugin_path}")
-        log(f"Packages file size: {output_path.stat().st_size} bytes")  # ✅ Debug 输出文件大小
+        log(f"Packages file size: {output_path.stat().st_size} bytes")
     except Exception as e:
         log(f"Failed to generate Packages: {e}")
 
