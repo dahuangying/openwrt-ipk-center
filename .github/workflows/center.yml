@@ -28,7 +28,7 @@ jobs:
       - name: Install ipkg-make-index
         run: |
           mkdir -p ~/ipkg-tools
-          curl -Lo ~/ipkg-tools/ipkg-make-index.sh https://raw.githubusercontent.com/openwrt/openwrt/master/scripts/ipkg/ipkg-make-index.sh
+          curl -Lo ~/ipkg-tools/ipkg-make-index.sh https://raw.githubusercontent.com/openwrt/openwrt/master/scripts/ipkg-make-index.sh
           chmod +x ~/ipkg-tools/ipkg-make-index.sh
           sudo ln -sf ~/ipkg-tools/ipkg-make-index.sh /usr/local/bin/ipkg-make-index
 
@@ -51,4 +51,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./publish
+
 
