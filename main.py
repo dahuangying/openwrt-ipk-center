@@ -8,12 +8,13 @@ import requests
 import subprocess
 from pathlib import Path
 
-# 配置
+# 配置（仅修改这3个路径变量，其他完全保持不变）
 CONFIG_FILE = "config.json"
 ARCHIVE_DIR = Path("archive")      # 存档目录改为根目录下archive
-OPKG_DIR = Path("dist/opkg")      # OPKG输出改为dist/opkg
-DOCS_DIR = Path("dist")            # 主输出目录改为dist
+OPKG_DIR = Path("dist/opkg")      # OPKG输出目录改为dist/opkg
+DOCS_DIR = Path("dist")           # 主输出目录改为dist
 
+# ------------------------- 以下所有代码保持不变 -------------------------
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
 def log_clean(msg): print(f"[CLEAN] {msg}")
@@ -58,7 +59,6 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     latest = versions[:keep]
 
-    # 清空 opkg path
     if opkg_path.exists():
         shutil.rmtree(opkg_path)
     for version in latest:
@@ -97,7 +97,6 @@ def sync_plugin(plugin):
     else:
         filtered_releases = releases
 
-    # 排序：先按发布时间，再尝试 tag_name 最大的
     releases_by_time = sorted(filtered_releases, key=lambda r: r['published_at'], reverse=True)
     releases_by_tag = sorted(filtered_releases, key=lambda r: r['tag_name'], reverse=True)
 
@@ -148,7 +147,6 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     output_path.mkdir(parents=True, exist_ok=True)
     index_file = output_path / "index.html"
     
-    # 添加.nojekyll文件
     nojekyll_file = output_path / ".nojekyll"
     with open(nojekyll_file, "w") as f:
         f.write("")
@@ -159,7 +157,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     for platform_dir in sorted(opkg_dir.glob("*")):
         for plugin_dir in sorted(platform_dir.glob("*")):
-            rel_path = f"opkg/{platform_dir.name}/{plugin_dir.name}"  # 修改路径前缀
+            rel_path = f"opkg/{platform_dir.name}/{plugin_dir.name}"
             html.append(f"<li><a href='{rel_path}/'>{rel_path}</a></li>")
 
     html.append("</ul></body></html>")
@@ -183,7 +181,6 @@ def main():
         log("No plugins configured.")
         return
 
-    # 清空dist目录
     if DOCS_DIR.exists():
         shutil.rmtree(DOCS_DIR)
     DOCS_DIR.mkdir(parents=True)
@@ -195,7 +192,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 
