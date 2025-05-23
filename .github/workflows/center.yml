@@ -27,6 +27,16 @@ jobs:
           sudo apt-get update && sudo apt-get install -y gzip  # 安装 gzip
           gzip --version  # 确认 gzip 安装成功
 
+      - name: Check gzip installation
+        run: |
+          echo "Checking gzip availability..."
+          if ! command -v gzip &> /dev/null; then
+            echo "gzip could not be found, exiting."
+            exit 1
+          else
+            echo "gzip is available."
+          fi
+
       - name: Run sync script
         run: |
           echo "Starting sync script"
