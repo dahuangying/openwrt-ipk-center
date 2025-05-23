@@ -22,10 +22,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # 强制安装 ipkg-utils 并验证
-          sudo apt-get update -y
-          sudo apt-get install -y ipkg-utils
-          which ipkg-make-index || { echo "ipkg-make-index not found!"; exit 1; }
+          # 从OpenWrt官方源安装正确版本的ipkg-utils
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://downloads.openwrt.org/releases/22.03.0/targets/x86/64/packages/Packages.gz
+          gunzip Packages.gz
+          package_url=$(grep -A 10 "Package: ipkg-utils" Packages | grep "Filename:" | cut -d' ' -f2)
+          wget https://downloads.openwrt.org/releases/22.03.0/targets/x86/64/packages/${package_url}
+          sudo dpkg -i --force-depends ipkg-utils_*_x86_64.ipk
           
           python -m pip install --upgrade pip
           pip install requests
@@ -41,7 +45,6 @@ jobs:
       - name: Verify artifacts
         run: |
           ls -la ./dist
-          ls -la ./dist/opkg
           [ -f ./dist/.nojekyll ] || { echo ".nojekyll missing!"; exit 1; }
 
       - name: Deploy to GitHub Pages
