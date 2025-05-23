@@ -24,8 +24,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests
-          sudo apt-get update && sudo apt-get install -y gzip  # 安装 gzip
-          gzip --version  # 确认 gzip 安装成功
+          sudo apt-get update
+          sudo apt-get install -y gzip  # 安装 gzip
+          which gzip  # 确认 gzip 安装路径
+          gzip --version  # 确认 gzip 版本
 
       - name: Check gzip installation
         run: |
@@ -51,6 +53,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           exclude: ''
+
 
 
 
