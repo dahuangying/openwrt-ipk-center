@@ -10,9 +10,9 @@ from pathlib import Path
 
 # 配置
 CONFIG_FILE = "config.json"
-ARCHIVE_DIR = Path("docs/archive")
-OPKG_DIR = Path("docs/opkg")
-DOCS_DIR = Path("docs")  # 用来存放 index.html
+ARCHIVE_DIR = Path("archive")
+OPKG_DIR = Path("opkg")
+DOCS_DIR = Path(".")  # 用来存放 index.html
 
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
@@ -184,7 +184,7 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
-    generate_html_index(OPKG_DIR, OPKG_DIR)
+    generate_html_index(OPKG_DIR, Path("."))
 
 if __name__ == "__main__":
     main()
