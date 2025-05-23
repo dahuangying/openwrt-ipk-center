@@ -22,27 +22,33 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # 强制安装 ipkg-utils 并验证
+          sudo apt-get update -y
+          sudo apt-get install -y ipkg-utils
+          which ipkg-make-index || { echo "ipkg-make-index not found!"; exit 1; }
+          
           python -m pip install --upgrade pip
           pip install requests
-          sudo apt-get update
-          sudo apt-get install -y ipkg-utils  # 修复关键错误：安装ipkg-make-index
+
+      - name: Prepare directories
+        run: |
+          mkdir -p archive dist/opkg
+          ls -la
 
       - name: Run sync script
-        run: |
-          mkdir -p archive dist/opkg  # 确保目录存在
-          python main.py
+        run: python main.py
 
-      - name: List generated files
+      - name: Verify artifacts
         run: |
           ls -la ./dist
           ls -la ./dist/opkg
+          [ -f ./dist/.nojekyll ] || { echo ".nojekyll missing!"; exit 1; }
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          keep_files: false
           force_orphan: true
 
 
