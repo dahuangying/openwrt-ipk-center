@@ -5,17 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpenWrt 软件包中心</title>
     <style>
-        /* 保持之前的样式不变，只添加以下新样式 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: var(--text-color);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        h1 {
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+        }
+        .search-box {
+            margin: 20px auto;
+            max-width: 500px;
+        }
+        #search {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .platform-tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .platform-tab {
+            padding: 8px 16px;
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .platform-tab:hover, .platform-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
         .platform-content {
             display: none;
-            animation: fadeIn 0.3s;
         }
         .platform-content.active {
             display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
     </style>
 </head>
@@ -23,18 +80,23 @@
     <div class="container">
         <header>
             <h1>OpenWrt 软件包中心</h1>
-            <div class="last-updated">最后更新: 2025-05-24 16:23:28</div>
+            <div class="last-updated">最后更新: 2025-05-24 16:38:13</div>
         </header>
+
+        <div class="search-box">
+            <input type="text" id="search" placeholder="输入软件包名称搜索..." onkeyup="searchPackages()">
+        </div>
 
         <div class="platform-tabs">
             <div class="platform-tab active" onclick="showPlatform('all')">全部平台</div>
             <div class="platform-tab" onclick="showPlatform('aarch64_cortex-a53')">aarch64_cortex-a53</div><div class="platform-tab" onclick="showPlatform('aarch64_generic')">aarch64_generic</div><div class="platform-tab" onclick="showPlatform('x86_64')">x86_64</div>
         </div>
 
-        <!-- 全部平台内容 -->
         <div id="platform-all" class="platform-content active">
-            
-                <div class="package-item">
+            <p>显示所有平台的软件包（共 27 个）</p>
+            <ul class="package-list">
+    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -42,10 +104,9 @@
                             <span>大小: 8.8 MB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -53,10 +114,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -64,10 +124,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -75,10 +134,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -86,10 +144,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -97,10 +154,9 @@
                             <span>大小: 247.5 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -108,10 +164,9 @@
                             <span>大小: 14.3 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -119,10 +174,9 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -130,9 +184,9 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="opkg/aarch64_generic/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -140,10 +194,9 @@
                             <span>大小: 8.8 MB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="opkg/aarch64_generic/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -151,10 +204,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="opkg/aarch64_generic/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -162,10 +214,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="opkg/aarch64_generic/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -173,10 +224,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="opkg/aarch64_generic/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -184,10 +234,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="opkg/aarch64_generic/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -195,10 +244,9 @@
                             <span>大小: 247.5 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="opkg/aarch64_generic/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -206,10 +254,9 @@
                             <span>大小: 14.3 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="opkg/aarch64_generic/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -217,10 +264,9 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="opkg/aarch64_generic/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -228,9 +274,9 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="opkg/x86_64/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -238,10 +284,9 @@
                             <span>大小: 8.8 MB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="opkg/x86_64/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -249,10 +294,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="opkg/x86_64/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -260,10 +304,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="opkg/x86_64/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -271,10 +314,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="opkg/x86_64/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -282,10 +324,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="opkg/x86_64/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -293,10 +334,9 @@
                             <span>大小: 247.5 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="opkg/x86_64/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -304,10 +344,9 @@
                             <span>大小: 14.3 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="opkg/x86_64/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -315,10 +354,9 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="opkg/x86_64/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -326,15 +364,16 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
+                </li>
+                    
+            </ul>
         </div>
-
-        <!-- 各平台单独内容 -->
-        
+    
         <div id="platform-aarch64_cortex-a53" class="platform-content">
-            
-                <div class="package-item">
+            <h2>平台: aarch64_cortex-a53</h2>
+            <ul class="package-list">
+        
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -342,10 +381,9 @@
                             <span>大小: 8.8 MB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -353,10 +391,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -364,10 +401,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -375,10 +411,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -386,10 +421,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -397,10 +431,9 @@
                             <span>大小: 247.5 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -408,10 +441,9 @@
                             <span>大小: 14.3 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -419,10 +451,9 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="opkg/aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -430,13 +461,16 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
+                </li>
+                    
+            </ul>
         </div>
         
         <div id="platform-aarch64_generic" class="platform-content">
-            
-                <div class="package-item">
+            <h2>平台: aarch64_generic</h2>
+            <ul class="package-list">
+        
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="opkg/aarch64_generic/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -444,10 +478,9 @@
                             <span>大小: 8.8 MB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="opkg/aarch64_generic/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -455,10 +488,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="opkg/aarch64_generic/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -466,10 +498,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="opkg/aarch64_generic/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -477,10 +508,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="opkg/aarch64_generic/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -488,10 +518,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="opkg/aarch64_generic/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -499,10 +528,9 @@
                             <span>大小: 247.5 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="opkg/aarch64_generic/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -510,10 +538,9 @@
                             <span>大小: 14.3 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="opkg/aarch64_generic/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -521,10 +548,9 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="opkg/aarch64_generic/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -532,13 +558,16 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
+                </li>
+                    
+            </ul>
         </div>
         
         <div id="platform-x86_64" class="platform-content">
-            
-                <div class="package-item">
+            <h2>平台: x86_64</h2>
+            <ul class="package-list">
+        
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="opkg/x86_64/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -546,10 +575,9 @@
                             <span>大小: 8.8 MB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="opkg/x86_64/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -557,10 +585,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="opkg/x86_64/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -568,10 +595,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="opkg/x86_64/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -579,10 +605,9 @@
                             <span>大小: 831.1 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="opkg/x86_64/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -590,10 +615,9 @@
                             <span>大小: 15.6 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="opkg/x86_64/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -601,10 +625,9 @@
                             <span>大小: 247.5 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="opkg/x86_64/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -612,10 +635,9 @@
                             <span>大小: 14.3 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="opkg/x86_64/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -623,10 +645,9 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
-
-                <div class="package-item">
+                </li>
+                    
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="opkg/x86_64/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -634,32 +655,46 @@
                             <span>大小: 14.7 KB</span>
                         </div>
                     </a>
-                </div>
-                
+                </li>
+                    
+            </ul>
         </div>
         
-
         <script>
             function showPlatform(platform) {
-                // 更新标签状态
                 document.querySelectorAll('.platform-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                    if (tab.textContent === platform || 
-                        (platform === 'all' && tab.textContent === '全部平台')) {
-                        tab.classList.add('active');
-                    }
+                    tab.classList.toggle('active', tab.textContent === platform || 
+                        (platform === 'all' && tab.textContent === '全部平台'));
                 });
-                
-                // 更新内容显示
                 document.querySelectorAll('.platform-content').forEach(content => {
-                    content.classList.remove('active');
-                    if (content.id === 'platform-' + platform || 
-                        (platform === 'all' && content.id === 'platform-all')) {
-                        content.classList.add('active');
-                    }
+                    content.classList.toggle('active', 
+                        content.id === 'platform-' + platform || 
+                        (platform === 'all' && content.id === 'platform-all'));
                 });
             }
+            function searchPackages() {
+                const input = document.getElementById('search');
+                const filter = input.value.toLowerCase();
+                const items = document.querySelectorAll('.package-item');
+                items.forEach(item => {
+                    const name = item.getAttribute('data-name');
+                    const platform = item.getAttribute('data-platform');
+                    const isMatch = name.includes(filter);
+                    const isActivePlatform = 
+                        document.querySelector('.platform-tab.active').textContent === '全部平台' ||
+                        platform === document.querySelector('.platform-tab.active').textContent;
+                    item.style.display = (isMatch && isActivePlatform) ? 'block' : 'none';
+                });
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                showPlatform('all');
+            });
         </script>
+        <footer>
+            <p>自动生成于 {last_updated} | 共 {total_packages} 个软件包</p>
+            <p>Powered by OpenWrt IPK Center</p>
+        </footer>
     </div>
 </body>
 </html>
+    
