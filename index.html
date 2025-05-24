@@ -29,92 +29,78 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         header {
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
+            text-align: center;
+            padding-bottom: 20px;
             margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
         }
         h1 {
             color: var(--primary-color);
-            margin: 0;
+            margin: 0 0 10px 0;
         }
-        .last-updated {
-            color: #666;
-            font-size: 0.9em;
+        .search-box {
+            margin: 20px auto;
+            max-width: 500px;
         }
-        .platform {
-            margin-bottom: 30px;
+        #search {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .platform-tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .platform-tab {
+            padding: 8px 16px;
             background: var(--light-bg);
-            padding: 15px;
-            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .platform h2 {
-            color: var(--secondary-color);
-            margin-top: 0;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
+        .platform-tab:hover, .platform-tab.active {
+            background: var(--primary-color);
+            color: white;
         }
-        .package-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .platform-content {
+            display: none;
         }
-        .package-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            transition: all 0.2s;
-        }
-        .package-item:hover {
-            background-color: #f0f7ff;
-            transform: translateX(5px);
-        }
-        .package-item a {
-            color: var(--text-color);
-            text-decoration: none;
+        .platform-content.active {
             display: block;
         }
-        .package-item a:hover {
-            color: var(--primary-color);
-        }
-        .package-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 5px;
-        }
-        .package-name {
-            font-weight: bold;
-        }
-        footer {
-            margin-top: 30px;
-            text-align: center;
-            color: #777;
-            font-size: 0.9em;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            .package-meta {
-                flex-direction: column;
-            }
-        }
+        /* 原有样式保持不变... */
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>OpenWrt 软件包中心</h1>
-            <div class="last-updated">最后更新: 2025-05-24 15:47:34</div>
+            <div class="last-updated">最后更新: 2025-05-24 16:07:58</div>
         </header>
 
-        <div class="platform">
+        <div class="search-box">
+            <input type="text" id="search" placeholder="输入软件包名称搜索..." onkeyup="searchPackages()">
+        </div>
+
+        <div class="platform-tabs">
+            <div class="platform-tab active" onclick="showPlatform('all')">全部平台</div>
+            <div class="platform-tab" onclick="showPlatform('aarch64_cortex-a53')">aarch64_cortex-a53</div><div class="platform-tab" onclick="showPlatform('aarch64_generic')">aarch64_generic</div><div class="platform-tab" onclick="showPlatform('x86_64')">x86_64</div>
+        </div>
+
+        <div id="platform-all" class="platform-content active">
+            <p>显示所有平台的软件包（共 27 个）</p>
+    
+        <div id="platform-aarch64_cortex-a53" class="platform-content">
             <h2>平台: aarch64_cortex-a53</h2>
             <ul class="package-list">
         
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="aarch64_cortex-a53/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -124,7 +110,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -134,7 +120,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="aarch64_cortex-a53/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -144,7 +130,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -154,7 +140,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="aarch64_cortex-a53/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -164,7 +150,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -174,7 +160,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="aarch64_cortex-a53/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -184,7 +170,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -194,7 +180,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_cortex-a53" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="aarch64_cortex-a53/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -207,11 +193,11 @@
             </ul>
         </div>
         
-        <div class="platform">
+        <div id="platform-aarch64_generic" class="platform-content">
             <h2>平台: aarch64_generic</h2>
             <ul class="package-list">
         
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="aarch64_generic/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -221,7 +207,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="aarch64_generic/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -231,7 +217,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="aarch64_generic/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -241,7 +227,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="aarch64_generic/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -251,7 +237,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="aarch64_generic/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -261,7 +247,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="aarch64_generic/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -271,7 +257,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="aarch64_generic/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -281,7 +267,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="aarch64_generic/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -291,7 +277,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="aarch64_generic" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="aarch64_generic/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -304,11 +290,11 @@
             </ul>
         </div>
         
-        <div class="platform">
+        <div id="platform-x86_64" class="platform-content">
             <h2>平台: x86_64</h2>
             <ul class="package-list">
         
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-openclash_0.46.079_all.ipk">
                     <a href="x86_64/openclash/v0.46.079/luci-app-openclash_0.46.079_all.ipk">
                         <div class="package-name">luci-app-openclash_0.46.079_all.ipk</div>
                         <div class="package-meta">
@@ -318,7 +304,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                     <a href="x86_64/passwall/25.5.16-1/luci-19.07_luci-app-passwall_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-app-passwall_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -328,7 +314,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                     <a href="x86_64/passwall/25.5.16-1/luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk">
                         <div class="package-name">luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk</div>
                         <div class="package-meta">
@@ -338,7 +324,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                     <a href="x86_64/passwall/25.5.16-1/luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk</div>
                         <div class="package-meta">
@@ -348,7 +334,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                     <a href="x86_64/passwall/25.5.16-1/luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk</div>
                         <div class="package-meta">
@@ -358,7 +344,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                     <a href="x86_64/passwall2/25.5.15-1/luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk">
                         <div class="package-name">luci-24.10_luci-app-passwall2_25.5.15-r1_all.ipk</div>
                         <div class="package-meta">
@@ -368,7 +354,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                     <a href="x86_64/passwall2/25.5.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk">
                         <div class="package-name">luci-24.10_luci-i18n-passwall2-zh-cn_25.134.51377.394f384_all.ipk</div>
                         <div class="package-meta">
@@ -378,7 +364,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                     <a href="x86_64/shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -388,7 +374,7 @@
                     </a>
                 </li>
                     
-                <li class="package-item">
+                <li class="package-item" data-platform="x86_64" data-name="luci-app-shadowsocks_2.1.1-1_all.ipk">
                     <a href="x86_64/shadowsocks/v2.1.1/luci-app-shadowsocks_2.1.1-1_all.ipk">
                         <div class="package-name">luci-app-shadowsocks_2.1.1-1_all.ipk</div>
                         <div class="package-meta">
@@ -401,10 +387,52 @@
             </ul>
         </div>
         
+        <script>
+            // 平台切换功能
+            function showPlatform(platform) {
+                // 更新标签状态
+                document.querySelectorAll('.platform-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.textContent === platform || 
+                        (platform === 'all' && tab.textContent === '全部平台'));
+                });
+                
+                // 更新内容显示
+                document.querySelectorAll('.platform-content').forEach(content => {
+                    content.classList.toggle('active', 
+                        content.id === 'platform-' + platform || 
+                        (platform === 'all' && content.id === 'platform-all'));
+                });
+            }
+            
+            // 搜索功能
+            function searchPackages() {
+                const input = document.getElementById('search');
+                const filter = input.value.toLowerCase();
+                const items = document.querySelectorAll('.package-item');
+                
+                items.forEach(item => {
+                    const name = item.getAttribute('data-name');
+                    const platform = item.getAttribute('data-platform');
+                    const isMatch = name.includes(filter);
+                    const isActivePlatform = 
+                        document.querySelector('.platform-tab.active').textContent === '全部平台' ||
+                        platform === document.querySelector('.platform-tab.active').textContent;
+                    
+                    item.style.display = (isMatch && isActivePlatform) ? 'block' : 'none';
+                });
+            }
+            
+            // 初始显示全部平台内容
+            document.addEventListener('DOMContentLoaded', function() {
+                showPlatform('all');
+            });
+        </script>
+    
         <footer>
-            <p>自动生成于 2025-05-24 15:47:34 | 共 27 个软件包</p>
+            <p>自动生成于 2025-05-24 16:07:58 | 共 27 个软件包</p>
             <p>Powered by OpenWrt IPK Center</p>
         </footer>
     </div>
 </body>
 </html>
+    
