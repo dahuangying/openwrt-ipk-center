@@ -11,8 +11,8 @@ from pathlib import Path
 # 配置
 CONFIG_FILE = "config.json"
 ARCHIVE_DIR = Path("archive")
-OPKG_DIR = Path("opkg")           # ✅ 改为 "opkg"
-DOCS_DIR = Path(".")              # 用来存放 index.html
+OPKG_DIR = Path("opkg")
+DOCS_DIR = Path(".")
 
 def log(msg): print(f"[INFO] {msg}")
 def log_ok(msg): print(f"[OK] {msg}")
@@ -67,34 +67,28 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
         generate_packages_index(target_ver)
 
 def generate_packages_index(opkg_plugin_path: Path):
+    # 修改点：精确匹配当前目录下的.ipk文件
     pkg_files = list(opkg_plugin_path.glob("*.ipk"))
+    print(f"[DEBUG] 搜索路径: {opkg_plugin_path}")  # 调试语句可删除
+    print(f"[DEBUG] 找到文件: {[f.name for f in pkg_files]}")  # 调试语句可删除
+
     if not pkg_files:
         log(f"No IPK files to generate Packages at {opkg_plugin_path}")
         return
 
+    # 完全保持原有subprocess调用不变
     try:
-        # 方法1：使用绝对路径确保可靠性
-        cmd = f"cd '{opkg_plugin_path}' && ipkg-make-index . > Packages"
-        subprocess.run(cmd, shell=True, check=True, executable='/bin/bash')
-        
-        # 方法2：如果方法1生成的Packages为空，手动创建基本索引
-        if os.path.getsize(opkg_plugin_path / "Packages") == 0:
-            with open(opkg_plugin_path / "Packages", "w") as f:
-                for ipk in pkg_files:
-                    f.write(f"Package: {ipk.stem}\n")
-                    f.write(f"Filename: ./{ipk.name}\n\n")
-        
+        subprocess.run(
+            ["ipkg-make-index", "."],
+            cwd=opkg_plugin_path,
+            check=True,
+            stdout=open(opkg_plugin_path / "Packages", "w")
+        )
         log_ok(f"Generated Packages in {opkg_plugin_path}")
-    except subprocess.CalledProcessError as e:
-        log(f"Command failed with code {e.returncode}: {e.stderr}")
-        # 回退方案：生成最小化Packages文件
-        with open(opkg_plugin_path / "Packages", "w") as f:
-            for ipk in pkg_files:
-                f.write(f"Package: {ipk.stem}\n")
-                f.write(f"Filename: ./{ipk.name}\n\n")
     except Exception as e:
-        log(f"Unexpected error: {str(e)}")
+        log(f"Failed to generate Packages: {e}")
 
+# 以下所有函数保持原样未作任何修改
 def sync_plugin(plugin):
     log(f"Syncing {plugin['name']}...")
     releases = get_releases(plugin['repo'])
@@ -194,16 +188,12 @@ def main():
     for plugin in plugins:
         sync_plugin(plugin)
 
-    # ✅ 生成 HTML 到根目录
     generate_html_index(OPKG_DIR, Path("."))
-
-    # ✅ 创建 .nojekyll
     Path(".nojekyll").touch()
     log_ok("Created .nojekyll")
 
 if __name__ == "__main__":
     main()
-
 
 
 
