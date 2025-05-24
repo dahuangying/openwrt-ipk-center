@@ -76,19 +76,15 @@ def generate_packages_index(opkg_plugin_path: Path):
     gz_file = opkg_plugin_path / "Packages.gz"
 
     try:
-        # 方法1：使用系统命令生成（兼容性最好）
         subprocess.run(
             ["ipkg-make-index", "."],
             cwd=opkg_plugin_path,
             check=True,
             stdout=open(packages_file, "w")
         )
-        
-        # 验证文件是否生成
         if not packages_file.exists():
             raise FileNotFoundError("Packages file not created")
 
-        # 使用系统gzip命令压缩（避免Python gzip模块问题）
         subprocess.run(
             ["gzip", "-9c", "Packages"],
             cwd=opkg_plugin_path,
@@ -98,21 +94,17 @@ def generate_packages_index(opkg_plugin_path: Path):
 
     except Exception as e:
         log(f"Primary method failed: {str(e)}")
-        
-        # 方法2：完全手动生成
         with open(packages_file, "w") as f:
             for ipk in pkg_files:
                 name_parts = ipk.stem.split('_')
                 pkg_name = '_'.join(name_parts[:-2]) if len(name_parts) > 2 else name_parts[0]
                 version = name_parts[-2] if len(name_parts) >= 2 else "1.0"
-                
                 f.write(f"Package: {pkg_name}\n")
                 f.write(f"Version: {version}\n")
                 f.write(f"Architecture: {name_parts[-1]}\n")
                 f.write(f"Filename: ./{ipk.name}\n")
                 f.write(f"Size: {ipk.stat().st_size}\n\n")
 
-        # 手动压缩
         subprocess.run(
             ["gzip", "-9c", "Packages"],
             cwd=opkg_plugin_path,
@@ -122,7 +114,6 @@ def generate_packages_index(opkg_plugin_path: Path):
 
     log_ok(f"Index files generated at {opkg_plugin_path}")
 
-# 以下所有函数保持原样未作任何修改
 def sync_plugin(plugin):
     log(f"Syncing {plugin['name']}...")
     releases = get_releases(plugin['repo'])
@@ -206,6 +197,29 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     log_ok(f"Generated HTML index: {index_file}")
 
+# ✅ 新增：生成平台根目录 Packages.gz（用于 opkg 源）
+def generate_platform_level_packages_index(opkg_dir: Path):
+    for platform_dir in opkg_dir.glob("*"):
+        if not platform_dir.is_dir():
+            continue
+        all_ipks = list(platform_dir.glob("**/*.ipk"))
+        if not all_ipks:
+            continue
+        packages_file = platform_dir / "Packages"
+        gz_file = platform_dir / "Packages.gz"
+        with open(packages_file, "w") as f:
+            for ipk in all_ipks:
+                name_parts = ipk.stem.split('_')
+                pkg_name = '_'.join(name_parts[:-2]) if len(name_parts) > 2 else name_parts[0]
+                version = name_parts[-2] if len(name_parts) >= 2 else "1.0"
+                f.write(f"Package: {pkg_name}\n")
+                f.write(f"Version: {version}\n")
+                f.write(f"Architecture: {name_parts[-1]}\n")
+                f.write(f"Filename: {ipk.relative_to(platform_dir)}\n")
+                f.write(f"Size: {ipk.stat().st_size}\n\n")
+        subprocess.run(["gzip", "-9c", "Packages"], cwd=platform_dir, stdout=open(gz_file, "wb"), check=True)
+        log_ok(f"Generated platform-level Packages.gz in {platform_dir}")
+
 def main():
     if not os.path.isfile(CONFIG_FILE):
         log(f"Config file {CONFIG_FILE} not found!")
@@ -226,8 +240,12 @@ def main():
     Path(".nojekyll").touch()
     log_ok("Created .nojekyll")
 
+    # ✅ 添加平台级 Packages.gz 生成
+    generate_platform_level_packages_index(OPKG_DIR)
+
 if __name__ == "__main__":
     main()
+
 
 
 
