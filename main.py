@@ -73,35 +73,43 @@ def generate_packages_index(opkg_plugin_path: Path):
         return
 
     try:
-        # 方法1：使用新版工具命令
+        # 方法1：使用ipkg-make-index生成Packages
         cmd = f"cd '{opkg_plugin_path}' && ipkg-make-index . > Packages"
         subprocess.run(cmd, shell=True, check=True, executable='/bin/bash')
         
-        # 检查是否生成了有效内容
+        # 新增：生成Packages.gz
+        subprocess.run(
+            ["gzip", "-9c", "Packages"],
+            cwd=opkg_plugin_path,
+            stdout=open(opkg_plugin_path / "Packages.gz", "wb"),
+            check=True
+        )
+        
+        # 方法2：如果自动生成失败，使用备用方案
         if os.path.getsize(opkg_plugin_path / "Packages") == 0:
-            raise ValueError("Generated empty Packages file")
+            with open(opkg_plugin_path / "Packages", "w") as f:
+                for ipk in pkg_files:
+                    name_parts = ipk.stem.split('_')
+                    pkg_name = '_'.join(name_parts[:-2]) if len(name_parts) > 2 else name_parts[0]
+                    version = name_parts[-2] if len(name_parts) >= 2 else "1.0"
+                    
+                    f.write(f"Package: {pkg_name}\n")
+                    f.write(f"Version: {version}\n")
+                    f.write(f"Filename: ./{ipk.name}\n\n")
             
-        log_ok(f"Generated Packages via ipkg-make-index at {opkg_plugin_path}")
+            # 备用方案也要生成gz文件
+            subprocess.run(
+                ["gzip", "-9c", "Packages"],
+                cwd=opkg_plugin_path,
+                stdout=open(opkg_plugin_path / "Packages.gz", "wb"),
+                check=True
+            )
+        
+        log_ok(f"Generated Packages and Packages.gz at {opkg_plugin_path}")
         
     except Exception as e:
-        log(f"Using fallback method due to: {str(e)}")
-        # 方法2：手动生成增强版索引
-        with open(opkg_plugin_path / "Packages", "w") as f:
-            for ipk in pkg_files:
-                # 从文件名解析基础信息（示例：luci-app-passwall_1.2.3_all.ipk）
-                name_parts = ipk.stem.split('_')
-                pkg_name = '_'.join(name_parts[:-2]) if len(name_parts) > 2 else name_parts[0]
-                version = name_parts[-2] if len(name_parts) >= 2 else "1.0"
-                arch = name_parts[-1] if len(name_parts) >= 1 else "all"
-                
-                f.write(f"Package: {pkg_name}\n")
-                f.write(f"Version: {version}\n")  # 新增版本号
-                f.write(f"Architecture: {arch}\n")  # 新增架构
-                f.write(f"Filename: ./{ipk.name}\n")
-                f.write(f"Size: {ipk.stat().st_size}\n")  # 新增文件大小
-                f.write("Description: Auto-generated\n\n")  # 新增描述
-                
-        log_ok(f"Generated fallback Packages at {opkg_plugin_path}")
+        log(f"Error generating index: {str(e)}")
+        raise
 
 # 以下所有函数保持原样未作任何修改
 def sync_plugin(plugin):
