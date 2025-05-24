@@ -67,14 +67,29 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
         generate_packages_index(target_ver)
 
 def generate_packages_index(opkg_plugin_path: Path):
-    # 修改点：精确匹配当前目录下的.ipk文件
+    # 修改点1：精确匹配.ipk文件路径（不递归）
     pkg_files = list(opkg_plugin_path.glob("*.ipk"))
-    print(f"[DEBUG] 搜索路径: {opkg_plugin_path}")  # 调试语句可删除
-    print(f"[DEBUG] 找到文件: {[f.name for f in pkg_files]}")  # 调试语句可删除
+    print(f"路径调试: {opkg_plugin_path} 中的IPK文件 -> {[f.name for f in pkg_files]}")  # 新增调试输出
 
     if not pkg_files:
-        log(f"No IPK files to generate Packages at {opkg_plugin_path}")
+        log(f"警告: 目录 {opkg_plugin_path} 内未找到.ipk文件")
         return
+
+    try:
+        # 修改点2：直接指定输出文件路径（避免路径转义问题）
+        with open(opkg_plugin_path / "Packages", "w") as f:
+            subprocess.run(
+                ["ipkg-make-index", "."],
+                cwd=str(opkg_plugin_path),  # 强制转为字符串路径
+                stdout=f,
+                stderr=subprocess.PIPE,
+                check=True
+            )
+        log_ok(f"Packages生成成功: {opkg_plugin_path}/Packages")
+    except subprocess.CalledProcessError as e:
+        log(f"命令执行失败: {e.stderr.decode().strip()}")
+    except Exception as e:
+        log(f"未知错误: {str(e)}")
 
     # 完全保持原有subprocess调用不变
     try:
