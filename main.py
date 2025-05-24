@@ -73,32 +73,36 @@ def generate_packages_index(opkg_plugin_path: Path):
         return
 
     try:
-        # 方法1：使用完整命令生成标准索引
-        cmd = f"""
-        cd '{opkg_plugin_path}' && \
-        find . -name '*.ipk' -exec ipkg-make-index {{}} + > Packages && \
-        gzip -9c Packages > Packages.gz
-        """
+        # 方法1：简化命令，仅处理当前目录
+        cmd = f"cd '{opkg_plugin_path}' && ipkg-make-index . > Packages"
         subprocess.run(cmd, shell=True, check=True, executable='/bin/bash')
         
-        # 方法2：如果标准方法失败，生成增强版最小索引
+        # 方法2：如果标准方法失败，生成增强版索引
         if not (opkg_plugin_path / "Packages").exists():
             with open(opkg_plugin_path / "Packages", "w") as f:
                 for ipk in pkg_files:
-                    name_parts = ipk.stem.split('_')
-                    pkg_name = '_'.join(name_parts[:-2])  # 提取基础包名
-                    pkg_version = name_parts[-2]  # 提取版本号
+                    # 从文件名提取元数据（示例：luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk）
+                    parts = ipk.stem.split('_')
+                    pkg_name = parts[1] if parts[0].startswith('luci-') else parts[0]
+                    version = parts[-2]
+                    arch = parts[-1]
                     
                     f.write(f"Package: {pkg_name}\n")
-                    f.write(f"Version: {pkg_version}\n")
-                    f.write(f"Architecture: {name_parts[-1]}\n")  # 架构(all/x86_64等)
+                    f.write(f"Version: {version}\n")
+                    f.write(f"Architecture: {arch}\n")
                     f.write(f"Filename: ./{ipk.name}\n")
-                    f.write(f"Size: {ipk.stat().st_size}\n\n")
+                    f.write(f"Size: {ipk.stat().st_size}\n")
+                    f.write(f"Description: Auto-generated package\n\n")
+        
+        # 生成压缩包（可选）
+        subprocess.run(f"gzip -9c '{opkg_plugin_path}/Packages' > '{opkg_plugin_path}/Packages.gz'", 
+                      shell=True, check=False)
         
         log_ok(f"Generated Packages at {opkg_plugin_path}")
+    except subprocess.CalledProcessError as e:
+        log(f"Command failed: {e.stderr.decode().strip()}")
     except Exception as e:
         log(f"Error generating Packages: {str(e)}")
-        raise
 
 # 以下所有函数保持原样未作任何修改
 def sync_plugin(plugin):
