@@ -67,29 +67,29 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
         generate_packages_index(target_ver)
 
 def generate_packages_index(opkg_plugin_path: Path):
-    # 修改点1：精确匹配.ipk文件路径（不递归）
-    pkg_files = list(opkg_plugin_path.glob("*.ipk"))
-    print(f"路径调试: {opkg_plugin_path} 中的IPK文件 -> {[f.name for f in pkg_files]}")  # 新增调试输出
-
+    # 获取所有.ipk文件（包括子目录）
+    pkg_files = list(opkg_plugin_path.rglob("*.ipk"))
+    
     if not pkg_files:
-        log(f"警告: 目录 {opkg_plugin_path} 内未找到.ipk文件")
+        log(f"No IPK files found in {opkg_plugin_path}")
         return
 
     try:
-        # 修改点2：直接指定输出文件路径（避免路径转义问题）
-        with open(opkg_plugin_path / "Packages", "w") as f:
-            subprocess.run(
-                ["ipkg-make-index", "."],
-                cwd=str(opkg_plugin_path),  # 强制转为字符串路径
-                stdout=f,
-                stderr=subprocess.PIPE,
-                check=True
-            )
-        log_ok(f"Packages生成成功: {opkg_plugin_path}/Packages")
-    except subprocess.CalledProcessError as e:
-        log(f"命令执行失败: {e.stderr.decode().strip()}")
+        # 方法1：使用find+ipkg-make-index处理嵌套目录
+        cmd = f"find '{opkg_plugin_path}' -name '*.ipk' -exec ipkg-make-index {{}} \\; > '{opkg_plugin_path}/Packages'"
+        subprocess.run(cmd, shell=True, check=True)
+        
+        # 方法2：如果方法1失败，生成最小化Packages文件
+        if not (opkg_plugin_path / "Packages").exists():
+            with open(opkg_plugin_path / "Packages", "w") as f:
+                for ipk in pkg_files:
+                    rel_path = ipk.relative_to(opkg_plugin_path)
+                    f.write(f"Package: {ipk.stem}\n")
+                    f.write(f"Filename: {rel_path}\n\n")
+        
+        log_ok(f"Generated Packages in {opkg_plugin_path}")
     except Exception as e:
-        log(f"未知错误: {str(e)}")
+        log(f"Failed to generate Packages: {e}")
 
     # 完全保持原有subprocess调用不变
     try:
