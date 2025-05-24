@@ -294,25 +294,30 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
             display: block;
         }}
         
+        /* 修改这里，改成一整条长条横向排列 */
         .package-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
             margin-top: 1rem;
         }}
         
         .package-card {{
             background: white;
-            border-radius: 12px;
-            overflow: hidden;
+            border-radius: 8px;
             box-shadow: var(--card-shadow);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            overflow: hidden;
         }}
         
         .package-card:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 18px -4px rgba(0, 0, 0, 0.12);
         }}
         
         .package-card::before {{
@@ -325,35 +330,29 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
             background: linear-gradient(90deg, var(--primary), var(--accent));
         }}
         
-        .package-content {{
-            padding: 1.5rem;
-        }}
-        
         .package-name {{
             font-weight: 600;
             font-size: 1.1rem;
-            margin-bottom: 0.5rem;
             color: var(--dark);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+            flex: 2;
+            white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
         }}
         
         .package-meta {{
+            flex: 1;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
+            gap: 1.5rem;
             font-size: 0.9rem;
             color: var(--gray);
-            margin-top: 1rem;
-            padding-top: 0.8rem;
-            border-top: 1px dashed rgba(0, 0, 0, 0.1);
+            user-select: none;
         }}
         
         .download-btn {{
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 0.6rem 1rem;
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
             background: var(--primary);
             color: white;
             text-decoration: none;
@@ -361,7 +360,8 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
             font-weight: 500;
             transition: all 0.2s;
             text-align: center;
-            width: 100%;
+            cursor: pointer;
+            white-space: nowrap;
         }}
         
         .download-btn:hover {{
@@ -393,13 +393,18 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
             }}
             
             .package-grid {{
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
             }}
             
             .platform-tabs {{
                 justify-content: flex-start;
                 overflow-x: auto;
                 padding-bottom: 0.5rem;
+            }}
+
+            .package-meta {{
+                display: none; /* 手机屏幕隐藏版本和大小显示，节省空间 */
             }}
         }}
     </style>
@@ -440,14 +445,12 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
                     html += f"""
                 <div class="package-card" data-platform="{platform}" data-name="{ipk_file.name.lower()}">
-                    <div class="package-content">
-                        <div class="package-name">{ipk_file.name}</div>
-                        <div class="package-meta">
-                            <span>版本: {version_dir.name}</span>
-                            <span>大小: {size_str}</span>
-                        </div>
-                        <a href="{rel_path}" class="download-btn">下载</a>
+                    <div class="package-name">{ipk_file.name}</div>
+                    <div class="package-meta">
+                        <span>版本: {version_dir.name}</span>
+                        <span>大小: {size_str}</span>
                     </div>
+                    <a href="{rel_path}" class="download-btn">下载</a>
                 </div>
                     """
     
@@ -477,14 +480,12 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
                     html += f"""
                 <div class="package-card" data-platform="{platform}" data-name="{ipk_file.name.lower()}">
-                    <div class="package-content">
-                        <div class="package-name">{ipk_file.name}</div>
-                        <div class="package-meta">
-                            <span>版本: {version_dir.name}</span>
-                            <span>大小: {size_str}</span>
-                        </div>
-                        <a href="{rel_path}" class="download-btn">下载</a>
+                    <div class="package-name">{ipk_file.name}</div>
+                    <div class="package-meta">
+                        <span>版本: {version_dir.name}</span>
+                        <span>大小: {size_str}</span>
                     </div>
+                    <a href="{rel_path}" class="download-btn">下载</a>
                 </div>
                     """
         
@@ -493,27 +494,26 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
         </div>
         """
 
-    # JavaScript部分保持不变
-    html += """
+    html += f"""
         <script>
-            function showPlatform(platform) {
-                document.querySelectorAll('.platform-tab').forEach(tab => {
+            function showPlatform(platform) {{
+                document.querySelectorAll('.platform-tab').forEach(tab => {{
                     tab.classList.toggle('active', tab.textContent === platform || 
                         (platform === 'all' && tab.textContent === '全部平台'));
-                });
-                document.querySelectorAll('.platform-content').forEach(content => {
+                }});
+                document.querySelectorAll('.platform-content').forEach(content => {{
                     content.classList.toggle('active', 
                         content.id === 'platform-' + platform || 
                         (platform === 'all' && content.id === 'platform-all'));
-                });
-            }
+                }});
+            }}
             
-            function searchPackages() {
+            function searchPackages() {{
                 const input = document.getElementById('search');
                 const filter = input.value.toLowerCase();
                 const items = document.querySelectorAll('.package-card');
                 
-                items.forEach(item => {
+                items.forEach(item => {{
                     const name = item.getAttribute('data-name');
                     const platform = item.getAttribute('data-platform');
                     const isMatch = name.includes(filter);
@@ -521,13 +521,13 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
                         document.querySelector('.platform-tab.active').textContent === '全部平台' ||
                         platform === document.querySelector('.platform-tab.active').textContent;
                     
-                    item.style.display = (isMatch && isActivePlatform) ? 'block' : 'none';
-                });
-            }
+                    item.style.display = (isMatch && isActivePlatform) ? 'flex' : 'none';
+                }});
+            }}
             
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function() {{
                 showPlatform('all');
-            });
+            }});
         </script>
         
         <footer>
