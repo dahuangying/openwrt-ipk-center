@@ -69,33 +69,36 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
 def generate_packages_index(opkg_plugin_path: Path):
     pkg_files = list(opkg_plugin_path.glob("*.ipk"))
     if not pkg_files:
-        log(f"No IPK files to generate Packages at {opkg_plugin_path}")
+        log(f"No IPK files at {opkg_plugin_path}")
         return
 
     try:
-        # 方法1：优先使用原始工具生成
-        subprocess.run(
-            ["ipkg-make-index", "."],
-            cwd=opkg_plugin_path,
-            check=True,
-            stdout=open(opkg_plugin_path / "Packages", "w")
-        )
+        # 方法1：使用完整命令生成标准索引
+        cmd = f"""
+        cd '{opkg_plugin_path}' && \
+        find . -name '*.ipk' -exec ipkg-make-index {{}} + > Packages && \
+        gzip -9c Packages > Packages.gz
+        """
+        subprocess.run(cmd, shell=True, check=True, executable='/bin/bash')
         
-        # 方法2：如果生成的内容不完整，补充必要字段
-        with open(opkg_plugin_path / "Packages", "r+") as f:
-            content = f.read()
-            if "Version:" not in content:  # 检查是否缺少关键字段
-                f.seek(0)
+        # 方法2：如果标准方法失败，生成增强版最小索引
+        if not (opkg_plugin_path / "Packages").exists():
+            with open(opkg_plugin_path / "Packages", "w") as f:
                 for ipk in pkg_files:
-                    pkg_name = ipk.stem.split('_')[0]  # 从文件名提取基础包名
-                    pkg_version = '_'.join(ipk.stem.split('_')[1:])  # 提取版本部分
+                    name_parts = ipk.stem.split('_')
+                    pkg_name = '_'.join(name_parts[:-2])  # 提取基础包名
+                    pkg_version = name_parts[-2]  # 提取版本号
+                    
                     f.write(f"Package: {pkg_name}\n")
                     f.write(f"Version: {pkg_version}\n")
-                    f.write(f"Filename: ./{ipk.name}\n\n")
+                    f.write(f"Architecture: {name_parts[-1]}\n")  # 架构(all/x86_64等)
+                    f.write(f"Filename: ./{ipk.name}\n")
+                    f.write(f"Size: {ipk.stat().st_size}\n\n")
         
-        log_ok(f"Generated Packages in {opkg_plugin_path}")
+        log_ok(f"Generated Packages at {opkg_plugin_path}")
     except Exception as e:
-        log(f"Failed to generate Packages: {e}")
+        log(f"Error generating Packages: {str(e)}")
+        raise
 
 # 以下所有函数保持原样未作任何修改
 def sync_plugin(plugin):
