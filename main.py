@@ -53,6 +53,7 @@ def clean_old_versions(base_path: Path, keep=10):
         log_clean(f"Removing old version: {old_dir}")
         shutil.rmtree(old_dir)
 
+# ✅ 修改：只复制最新版本，不再生成每个插件的 Packages.gz
 def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     versions = [d for d in platform_path.iterdir() if d.is_dir()]
     versions.sort(key=lambda d: d.stat().st_mtime, reverse=True)
@@ -64,7 +65,6 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
     for version in latest:
         target_ver = opkg_path / version.name
         shutil.copytree(version, target_ver)
-        generate_packages_index(target_ver)
 
 def generate_packages_index(opkg_plugin_path: Path):
     pkg_files = list(opkg_plugin_path.glob("*.ipk"))
@@ -197,7 +197,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
     log_ok(f"Generated HTML index: {index_file}")
 
-# ✅ 新增：生成平台根目录 Packages.gz（用于 opkg 源）
+# ✅ 生成平台级 Packages.gz（用于 opkg 源）
 def generate_platform_level_packages_index(opkg_dir: Path):
     for platform_dir in opkg_dir.glob("*"):
         if not platform_dir.is_dir():
@@ -245,6 +245,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
