@@ -67,16 +67,120 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
         target_ver = opkg_path / version.name
         shutil.copytree(version, target_ver)
 
+def generate_packages_index(opkg_plugin_path: Path):
+    pkg_files = list(opkg_plugin_path.glob("*.ipk"))
+    if not pkg_files:
+        log(f"No IPK files at {opkg_plugin_path}")
+        return
+
+    packages_file = opkg_plugin_path / "Packages"
+    gz_file = opkg_plugin_path / "Packages.gz"
+
+    try:
+        subprocess.run(
+            ["ipkg-make-index", "."],
+            cwd=opkg_plugin_path,
+            check=True,
+            stdout=open(packages_file, "w")
+        )
+        if not packages_file.exists():
+            raise FileNotFoundError("Packages file not created")
+
+        subprocess.run(
+            ["gzip", "-9c", "Packages"],
+            cwd=opkg_plugin_path,
+            stdout=open(gz_file, "wb"),
+            check=True
+        )
+
+    except Exception as e:
+        log(f"Primary method failed: {str(e)}")
+        with open(packages_file, "w") as f:
+            for ipk in pkg_files:
+                name_parts = ipk.stem.split('_')
+                pkg_name = '_'.join(name_parts[:-2]) if len(name_parts) > 2 else name_parts[0]
+                version = name_parts[-2] if len(name_parts) >= 2 else "1.0"
+                f.write(f"Package: {pkg_name}\n")
+                f.write(f"Version: {version}\n")
+                f.write(f"Architecture: {name_parts[-1]}\n")
+                f.write(f"Filename: ./{ipk.name}\n")
+                f.write(f"Size: {ipk.stat().st_size}\n\n")
+
+        subprocess.run(
+            ["gzip", "-9c", "Packages"],
+            cwd=opkg_plugin_path,
+            stdout=open(gz_file, "wb"),
+            check=True
+        )
+
+    log_ok(f"Index files generated at {opkg_plugin_path}")
+
+def sync_plugin(plugin):
+    log(f"Syncing {plugin['name']}...")
+    releases = get_releases(plugin['repo'])
+    if not releases:
+        log(f"No releases found for {plugin['name']}.")
+        return
+
+    release_type = plugin.get("release_type", "stable").lower()
+    if release_type == "stable":
+        filtered_releases = [r for r in releases if not r.get("prerelease", False) and is_stable_version(r['tag_name'])]
+    elif release_type == "pre_release":
+        filtered_releases = [r for r in releases if r.get("prerelease", False)]
+    else:
+        filtered_releases = releases
+
+    releases_by_time = sorted(filtered_releases, key=lambda r: r['published_at'], reverse=True)
+    releases_by_tag = sorted(filtered_releases, key=lambda r: r['tag_name'], reverse=True)
+
+    new_count = 0
+    found = False
+
+    for release_list in [releases_by_time, releases_by_tag]:
+        for release in release_list:
+            tag = release['tag_name']
+            ipk_assets = [a for a in release.get("assets", []) if a['name'].endswith(".ipk")]
+            if not ipk_assets:
+                continue
+
+            found = True
+            for asset in ipk_assets:
+                asset_name = asset['name']
+                asset_url = asset['browser_download_url']
+
+                for platform in plugin['platforms']:
+                    if platform in asset_name or asset_name.endswith("_all.ipk"):
+                        archive_dir = ARCHIVE_DIR / platform / plugin['name'] / tag
+                        save_path = archive_dir / asset_name
+                        if not save_path.exists():
+                            if download_asset(asset_url, save_path):
+                                new_count += 1
+            break
+        if found:
+            break
+
+    if not found:
+        log(f"No IPK found in latest or highest versioned release for {plugin['name']}")
+        return
+
+    for platform in plugin['platforms']:
+        platform_archive_path = ARCHIVE_DIR / platform / plugin['name']
+        opkg_path = OPKG_DIR / platform / plugin['name']
+
+        if platform_archive_path.exists():
+            clean_old_versions(platform_archive_path, keep=1)
+            copy_latest_to_opkg(platform_archive_path, opkg_path, keep=1)
+        else:
+            log(f"Directory not found, skipping copy and index generation: {platform_archive_path}")
+
+    log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
+
 def generate_html_index(opkg_dir: Path, output_path: Path):
-    """
-    生成美观的软件包索引HTML页面
-    参数:
-        opkg_dir: 包含软件包的目录路径（结构：平台/插件名/版本/*.ipk）
-        output_path: HTML文件输出目录
-    """
     output_path.mkdir(parents=True, exist_ok=True)
     index_file = output_path / "index.html"
     last_updated = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    platforms = sorted([p.name for p in opkg_dir.glob("*") if p.is_dir()])
+    total_packages = sum(1 for _ in opkg_dir.rglob("*.ipk"))
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -86,99 +190,216 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     <title>OpenWrt 软件包中心</title>
     <style>
         :root {{
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --text-color: #333;
-            --light-bg: #f8f9fa;
-            --border-color: #ddd;
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }}
+        
         body {{
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            color: var(--text-color);
-        }}
-        .container {{
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }}
-        header {{
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }}
-        h1 {{
-            color: var(--primary-color);
-            margin: 0;
-        }}
-        .last-updated {{
-            color: #666;
-            font-size: 0.9em;
-        }}
-        .platform {{
-            margin-bottom: 30px;
-            background: var(--light-bg);
-            padding: 15px;
-            border-radius: 5px;
-        }}
-        .platform h2 {{
-            color: var(--secondary-color);
-            margin-top: 0;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
-        }}
-        .package-list {{
-            list-style: none;
             padding: 0;
-            margin: 0;
+            background-color: #f5f7fb;
+            color: var(--dark);
         }}
-        .package-item {{
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            transition: all 0.2s;
+        
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
         }}
-        .package-item:hover {{
-            background-color: #f0f7ff;
-            transform: translateX(5px);
+        
+        header {{
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }}
-        .package-item a {{
-            color: var(--text-color);
-            text-decoration: none;
+        
+        h1 {{
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }}
+        
+        .last-updated {{
+            color: var(--gray);
+            font-size: 0.95rem;
+        }}
+        
+        .search-box {{
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }}
+        
+        #search {{
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }}
+        
+        #search:focus {{
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }}
+        
+        .platform-tabs {{
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }}
+        
+        .platform-tab {{
+            padding: 0.6rem 1.2rem;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }}
+        
+        .platform-tab:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }}
+        
+        .platform-tab.active {{
+            background: var(--primary);
+            color: white;
+        }}
+        
+        .platform-content {{
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }}
+        
+        .platform-content.active {{
             display: block;
         }}
-        .package-item a:hover {{
-            color: var(--primary-color);
+        
+        .package-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
         }}
+        
+        .package-card {{
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }}
+        
+        .package-card:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }}
+        
+        .package-card::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }}
+        
+        .package-content {{
+            padding: 1.5rem;
+        }}
+        
+        .package-name {{
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }}
+        
         .package-meta {{
             display: flex;
             justify-content: space-between;
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 5px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 1px dashed rgba(0, 0, 0, 0.1);
         }}
-        .package-name {{
-            font-weight: bold;
-        }}
-        footer {{
-            margin-top: 30px;
+        
+        .download-btn {{
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.6rem 1rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
             text-align: center;
-            color: #777;
-            font-size: 0.9em;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
+            width: 100%;
         }}
+        
+        .download-btn:hover {{
+            background: var(--secondary);
+            transform: translateY(-1px);
+        }}
+        
+        footer {{
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }}
+        
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(10px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        
         @media (max-width: 768px) {{
             .container {{
-                padding: 15px;
+                padding: 1.5rem;
             }}
-            .package-meta {{
-                flex-direction: column;
+            
+            h1 {{
+                font-size: 2rem;
+            }}
+            
+            .package-grid {{
+                grid-template-columns: 1fr;
+            }}
+            
+            .platform-tabs {{
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
             }}
         }}
     </style>
@@ -189,61 +410,134 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
             <h1>OpenWrt 软件包中心</h1>
             <div class="last-updated">最后更新: {last_updated}</div>
         </header>
+
+        <div class="search-box">
+            <input type="text" id="search" placeholder="🔍 输入软件包名称搜索..." onkeyup="searchPackages()">
+        </div>
+
+        <div class="platform-tabs">
+            <div class="platform-tab active" onclick="showPlatform('all')">全部平台</div>
+            {"".join(f'<div class="platform-tab" onclick="showPlatform(\'{p}\')">{p}</div>' for p in platforms)}
+        </div>
+
+        <div id="platform-all" class="platform-content active">
+            <div class="package-grid">
 """
 
-    # 按平台分组
-    for platform_dir in sorted(opkg_dir.glob("*")):
-        if not platform_dir.is_dir():
-            continue
-
-        html += f"""
-        <div class="platform">
-            <h2>平台: {platform_dir.name}</h2>
-            <ul class="package-list">
-        """
-
-        # 按软件包分组
+    # 生成全部平台内容
+    for platform in platforms:
+        platform_dir = opkg_dir / platform
         for plugin_dir in sorted(platform_dir.glob("*")):
             if not plugin_dir.is_dir():
                 continue
-
-            # 按版本分组
             for version_dir in sorted(plugin_dir.glob("*")):
                 if not version_dir.is_dir():
                     continue
-
-                # 列出所有IPK文件
                 for ipk_file in sorted(version_dir.glob("*.ipk")):
                     file_size = ipk_file.stat().st_size
                     size_str = f"{file_size/1024:.1f} KB" if file_size < 1024*1024 else f"{file_size/(1024*1024):.1f} MB"
-                    rel_path = f"{platform_dir.name}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}"
+                    rel_path = f"opkg/{platform}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}"
 
                     html += f"""
-                <li class="package-item">
-                    <a href="{rel_path}">
+                <div class="package-card" data-platform="{platform}" data-name="{ipk_file.name.lower()}">
+                    <div class="package-content">
                         <div class="package-name">{ipk_file.name}</div>
                         <div class="package-meta">
                             <span>版本: {version_dir.name}</span>
                             <span>大小: {size_str}</span>
                         </div>
-                    </a>
-                </li>
+                        <a href="{rel_path}" class="download-btn">下载</a>
+                    </div>
+                </div>
                     """
+    
+    html += """
+            </div>
+        </div>
+    """
 
+    # 生成各平台单独内容
+    for platform in platforms:
+        platform_dir = opkg_dir / platform
+        html += f"""
+        <div id="platform-{platform}" class="platform-content">
+            <div class="package-grid">
+        """
+        
+        for plugin_dir in sorted(platform_dir.glob("*")):
+            if not plugin_dir.is_dir():
+                continue
+            for version_dir in sorted(plugin_dir.glob("*")):
+                if not version_dir.is_dir():
+                    continue
+                for ipk_file in sorted(version_dir.glob("*.ipk")):
+                    file_size = ipk_file.stat().st_size
+                    size_str = f"{file_size/1024:.1f} KB" if file_size < 1024*1024 else f"{file_size/(1024*1024):.1f} MB"
+                    rel_path = f"opkg/{platform}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}"
+
+                    html += f"""
+                <div class="package-card" data-platform="{platform}" data-name="{ipk_file.name.lower()}">
+                    <div class="package-content">
+                        <div class="package-name">{ipk_file.name}</div>
+                        <div class="package-meta">
+                            <span>版本: {version_dir.name}</span>
+                            <span>大小: {size_str}</span>
+                        </div>
+                        <a href="{rel_path}" class="download-btn">下载</a>
+                    </div>
+                </div>
+                    """
+        
         html += """
-            </ul>
+            </div>
         </div>
         """
 
-    html += f"""
+    # JavaScript部分保持不变
+    html += """
+        <script>
+            function showPlatform(platform) {
+                document.querySelectorAll('.platform-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.textContent === platform || 
+                        (platform === 'all' && tab.textContent === '全部平台'));
+                });
+                document.querySelectorAll('.platform-content').forEach(content => {
+                    content.classList.toggle('active', 
+                        content.id === 'platform-' + platform || 
+                        (platform === 'all' && content.id === 'platform-all'));
+                });
+            }
+            
+            function searchPackages() {
+                const input = document.getElementById('search');
+                const filter = input.value.toLowerCase();
+                const items = document.querySelectorAll('.package-card');
+                
+                items.forEach(item => {
+                    const name = item.getAttribute('data-name');
+                    const platform = item.getAttribute('data-platform');
+                    const isMatch = name.includes(filter);
+                    const isActivePlatform = 
+                        document.querySelector('.platform-tab.active').textContent === '全部平台' ||
+                        platform === document.querySelector('.platform-tab.active').textContent;
+                    
+                    item.style.display = (isMatch && isActivePlatform) ? 'block' : 'none';
+                });
+            }
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                showPlatform('all');
+            });
+        </script>
+        
         <footer>
-            <p>自动生成于 {last_updated} | 共 {sum(1 for _ in opkg_dir.rglob("*.ipk"))} 个软件包</p>
+            <p>自动生成于 {last_updated} | 共 {total_packages} 个软件包</p>
             <p>Powered by OpenWrt IPK Center</p>
         </footer>
     </div>
 </body>
 </html>
-"""
+    """
 
     with open(index_file, "w", encoding="utf-8") as f:
         f.write(html)
