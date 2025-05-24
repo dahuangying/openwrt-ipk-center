@@ -187,7 +187,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
             for version_dir in sorted(plugin_dir.glob("*")):
                 ipk_files = sorted(version_dir.glob("*.ipk"))
                 for ipk_file in ipk_files:
-                    rel_path = f"{platform_dir.name}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}"
+                    rel_path = f"opkg/{platform_dir.name}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}"
                     html.append(f"<li><a href='{rel_path}'>{rel_path}</a></li>")
 
     html.append("</ul></body></html>")
