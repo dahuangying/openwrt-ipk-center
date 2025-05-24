@@ -3,12 +3,10 @@ Version: 2.1.1-1
 Architecture: all
 Filename: ./luci-app-shadowsocks_2.1.1-1_all.ipk
 Size: 15103
-Description: Auto-generated
 
 Package: luci-app-shadowsocks-without-ipset
 Version: 2.1.1-1
 Architecture: all
 Filename: ./luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk
 Size: 15019
-Description: Auto-generated
 
