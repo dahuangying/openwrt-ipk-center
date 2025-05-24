@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import datetime  
 import os
 import re
 import sys
@@ -175,155 +176,182 @@ def sync_plugin(plugin):
     log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
 
 def generate_html_index(opkg_dir: Path, output_path: Path):
+    """
+    生成美观的软件包索引HTML页面
+    参数:
+        opkg_dir: 包含软件包的目录路径（结构：平台/插件名/版本/*.ipk）
+        output_path: HTML文件输出目录
+    """
     output_path.mkdir(parents=True, exist_ok=True)
     index_file = output_path / "index.html"
+    last_updated = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    html = """
-<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenWrt IPK Center</title>
+    <title>OpenWrt 软件包中心</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {{
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --border-color: #ddd;
+        }}
+        body {{
+            font-family: 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
-            color: #333;
-        }
-        .container {
+            color: var(--text-color);
+        }}
+        .container {{
             max-width: 1200px;
             margin: 0 auto;
             background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+        }}
+        header {{
+            border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
-        }
-        .platform {
+            margin-bottom: 20px;
+        }}
+        h1 {{
+            color: var(--primary-color);
+            margin: 0;
+        }}
+        .last-updated {{
+            color: #666;
+            font-size: 0.9em;
+        }}
+        .platform {{
             margin-bottom: 30px;
-            background: #f8f9fa;
+            background: var(--light-bg);
             padding: 15px;
             border-radius: 5px;
-        }
-        .platform h2 {
-            color: #2980b9;
+        }}
+        .platform h2 {{
+            color: var(--secondary-color);
             margin-top: 0;
-        }
-        .package-list {
-            list-style-type: none;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }}
+        .package-list {{
+            list-style: none;
             padding: 0;
-        }
-        .package-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid #eee;
-            transition: background-color 0.3s;
-        }
-        .package-item:hover {
+            margin: 0;
+        }}
+        .package-item {{
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }}
+        .package-item:hover {{
             background-color: #f0f7ff;
-        }
-        .package-item a {
-            color: #2c3e50;
+            transform: translateX(5px);
+        }}
+        .package-item a {{
+            color: var(--text-color);
             text-decoration: none;
             display: block;
-        }
-        .package-item a:hover {
-            color: #3498db;
-        }
-        .package-meta {
-            font-size: 0.9em;
-            color: #7f8c8d;
+        }}
+        .package-item a:hover {{
+            color: var(--primary-color);
+        }}
+        .package-meta {{
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #666;
             margin-top: 5px;
-        }
-        footer {
+        }}
+        .package-name {{
+            font-weight: bold;
+        }}
+        footer {{
             margin-top: 30px;
             text-align: center;
-            color: #7f8c8d;
+            color: #777;
             font-size: 0.9em;
-        }
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }}
+        @media (max-width: 768px) {{
+            .container {{
+                padding: 15px;
+            }}
+            .package-meta {{
+                flex-direction: column;
+            }}
+        }}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>OpenWrt 软件包中心</h1>
+        <header>
+            <h1>OpenWrt 软件包中心</h1>
+            <div class="last-updated">最后更新: {last_updated}</div>
+        </header>
 """
 
-    # 按平台分类
+    # 按平台分组
     for platform_dir in sorted(opkg_dir.glob("*")):
         if not platform_dir.is_dir():
             continue
-            
+
         html += f"""
         <div class="platform">
             <h2>平台: {platform_dir.name}</h2>
             <ul class="package-list">
         """
 
-        # 按软件包分类
+        # 按软件包分组
         for plugin_dir in sorted(platform_dir.glob("*")):
             if not plugin_dir.is_dir():
                 continue
-                
-            html += f"""
-            <li class="package-item">
-                <strong>{plugin_dir.name}</strong>
-                <ul class="version-list">
-            """
 
-            # 按版本分类
+            # 按版本分组
             for version_dir in sorted(plugin_dir.glob("*")):
                 if not version_dir.is_dir():
                     continue
-                    
-                html += f"""
-                <li>
-                    <span>版本: {version_dir.name}</span>
-                    <ul>
-                """
 
                 # 列出所有IPK文件
                 for ipk_file in sorted(version_dir.glob("*.ipk")):
-                    file_size = f"{ipk_file.stat().st_size/1024:.1f} KB"
+                    file_size = ipk_file.stat().st_size
+                    size_str = f"{file_size/1024:.1f} KB" if file_size < 1024*1024 else f"{file_size/(1024*1024):.1f} MB"
+                    rel_path = f"{platform_dir.name}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}"
+
                     html += f"""
-                    <li class="package-item">
-                        <a href="{platform_dir.name}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}">
-                            {ipk_file.name}
-                            <div class="package-meta">大小: {file_size}</div>
-                        </a>
-                    </li>
-                    """
-
-                html += """
-                    </ul>
+                <li class="package-item">
+                    <a href="{rel_path}">
+                        <div class="package-name">{ipk_file.name}</div>
+                        <div class="package-meta">
+                            <span>版本: {version_dir.name}</span>
+                            <span>大小: {size_str}</span>
+                        </div>
+                    </a>
                 </li>
-                """
-
-            html += """
-                </ul>
-            </li>
-            """
+                    """
 
         html += """
             </ul>
         </div>
         """
 
-    html += """
+    html += f"""
         <footer>
-            <p>最后更新时间: """ + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
+            <p>自动生成于 {last_updated} | 共 {sum(1 for _ in opkg_dir.rglob("*.ipk"))} 个软件包</p>
             <p>Powered by OpenWrt IPK Center</p>
         </footer>
     </div>
 </body>
 </html>
-    """
+"""
 
     with open(index_file, "w", encoding="utf-8") as f:
         f.write(html)
