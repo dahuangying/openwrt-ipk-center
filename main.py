@@ -67,41 +67,33 @@ def copy_latest_to_opkg(platform_path: Path, opkg_path: Path, keep=1):
         generate_packages_index(target_ver)
 
 def generate_packages_index(opkg_plugin_path: Path):
-    # 获取所有.ipk文件（包括子目录）
-    pkg_files = list(opkg_plugin_path.rglob("*.ipk"))
-    
+    pkg_files = list(opkg_plugin_path.glob("*.ipk"))
     if not pkg_files:
-        log(f"No IPK files found in {opkg_plugin_path}")
+        log(f"No IPK files to generate Packages at {opkg_plugin_path}")
         return
 
     try:
-        # 方法1：使用find+ipkg-make-index处理嵌套目录
-        cmd = f"find '{opkg_plugin_path}' -name '*.ipk' -exec ipkg-make-index {{}} \\; > '{opkg_plugin_path}/Packages'"
-        subprocess.run(cmd, shell=True, check=True)
+        # 方法1：使用绝对路径确保可靠性
+        cmd = f"cd '{opkg_plugin_path}' && ipkg-make-index . > Packages"
+        subprocess.run(cmd, shell=True, check=True, executable='/bin/bash')
         
-        # 方法2：如果方法1失败，生成最小化Packages文件
-        if not (opkg_plugin_path / "Packages").exists():
+        # 方法2：如果方法1生成的Packages为空，手动创建基本索引
+        if os.path.getsize(opkg_plugin_path / "Packages") == 0:
             with open(opkg_plugin_path / "Packages", "w") as f:
                 for ipk in pkg_files:
-                    rel_path = ipk.relative_to(opkg_plugin_path)
                     f.write(f"Package: {ipk.stem}\n")
-                    f.write(f"Filename: {rel_path}\n\n")
+                    f.write(f"Filename: ./{ipk.name}\n\n")
         
         log_ok(f"Generated Packages in {opkg_plugin_path}")
+    except subprocess.CalledProcessError as e:
+        log(f"Command failed with code {e.returncode}: {e.stderr}")
+        # 回退方案：生成最小化Packages文件
+        with open(opkg_plugin_path / "Packages", "w") as f:
+            for ipk in pkg_files:
+                f.write(f"Package: {ipk.stem}\n")
+                f.write(f"Filename: ./{ipk.name}\n\n")
     except Exception as e:
-        log(f"Failed to generate Packages: {e}")
-
-    # 完全保持原有subprocess调用不变
-    try:
-        subprocess.run(
-            ["ipkg-make-index", "."],
-            cwd=opkg_plugin_path,
-            check=True,
-            stdout=open(opkg_plugin_path / "Packages", "w")
-        )
-        log_ok(f"Generated Packages in {opkg_plugin_path}")
-    except Exception as e:
-        log(f"Failed to generate Packages: {e}")
+        log(f"Unexpected error: {str(e)}")
 
 # 以下所有函数保持原样未作任何修改
 def sync_plugin(plugin):
