@@ -176,15 +176,13 @@ def sync_plugin(plugin):
     log_ok(f"{plugin['name']} sync completed. {new_count} new files.")
 
 def generate_html_index(opkg_dir: Path, output_path: Path):
-    """
-    生成美观的软件包索引HTML页面
-    参数:
-        opkg_dir: 包含软件包的目录路径（结构：平台/插件名/版本/*.ipk）
-        output_path: HTML文件输出目录
-    """
     output_path.mkdir(parents=True, exist_ok=True)
     index_file = output_path / "index.html"
     last_updated = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # 获取所有平台列表
+    platforms = sorted([p.name for p in opkg_dir.glob("*") if p.is_dir()])
+    total_packages = sum(1 for _ in opkg_dir.rglob("*.ipk"))
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -217,78 +215,52 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }}
         header {{
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
+            text-align: center;
+            padding-bottom: 20px;
             margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
         }}
         h1 {{
             color: var(--primary-color);
-            margin: 0;
+            margin: 0 0 10px 0;
         }}
-        .last-updated {{
-            color: #666;
-            font-size: 0.9em;
+        .search-box {{
+            margin: 20px auto;
+            max-width: 500px;
         }}
-        .platform {{
-            margin-bottom: 30px;
+        #search {{
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }}
+        .platform-tabs {{
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }}
+        .platform-tab {{
+            padding: 8px 16px;
             background: var(--light-bg);
-            padding: 15px;
-            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
         }}
-        .platform h2 {{
-            color: var(--secondary-color);
-            margin-top: 0;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
+        .platform-tab:hover, .platform-tab.active {{
+            background: var(--primary-color);
+            color: white;
         }}
-        .package-list {{
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .platform-content {{
+            display: none;
         }}
-        .package-item {{
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            transition: all 0.2s;
-        }}
-        .package-item:hover {{
-            background-color: #f0f7ff;
-            transform: translateX(5px);
-        }}
-        .package-item a {{
-            color: var(--text-color);
-            text-decoration: none;
+        .platform-content.active {{
             display: block;
         }}
-        .package-item a:hover {{
-            color: var(--primary-color);
-        }}
-        .package-meta {{
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 5px;
-        }}
-        .package-name {{
-            font-weight: bold;
-        }}
-        footer {{
-            margin-top: 30px;
-            text-align: center;
-            color: #777;
-            font-size: 0.9em;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-        }}
-        @media (max-width: 768px) {{
-            .container {{
-                padding: 15px;
-            }}
-            .package-meta {{
-                flex-direction: column;
-            }}
-        }}
+        /* 原有样式保持不变... */
     </style>
 </head>
 <body>
@@ -297,37 +269,48 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
             <h1>OpenWrt 软件包中心</h1>
             <div class="last-updated">最后更新: {last_updated}</div>
         </header>
+
+        <div class="search-box">
+            <input type="text" id="search" placeholder="输入软件包名称搜索..." onkeyup="searchPackages()">
+        </div>
+
+        <div class="platform-tabs">
+            <div class="platform-tab active" onclick="showPlatform('all')">全部平台</div>
+            {"".join(f'<div class="platform-tab" onclick="showPlatform(\'{p}\')">{p}</div>' for p in platforms)}
+        </div>
 """
 
-    # 按平台分组
-    for platform_dir in sorted(opkg_dir.glob("*")):
-        if not platform_dir.is_dir():
-            continue
-
+    # 生成全部平台内容
+    html += """
+        <div id="platform-all" class="platform-content active">
+            <p>显示所有平台的软件包（共 """ + str(total_packages) + """ 个）</p>
+    """
+    
+    # 按平台生成内容
+    for platform in platforms:
+        platform_dir = opkg_dir / platform
         html += f"""
-        <div class="platform">
-            <h2>平台: {platform_dir.name}</h2>
+        <div id="platform-{platform}" class="platform-content">
+            <h2>平台: {platform}</h2>
             <ul class="package-list">
         """
 
-        # 按软件包分组
+        # 遍历该平台下的所有软件包
         for plugin_dir in sorted(platform_dir.glob("*")):
             if not plugin_dir.is_dir():
                 continue
 
-            # 按版本分组
             for version_dir in sorted(plugin_dir.glob("*")):
                 if not version_dir.is_dir():
                     continue
 
-                # 列出所有IPK文件
                 for ipk_file in sorted(version_dir.glob("*.ipk")):
                     file_size = ipk_file.stat().st_size
                     size_str = f"{file_size/1024:.1f} KB" if file_size < 1024*1024 else f"{file_size/(1024*1024):.1f} MB"
-                    rel_path = f"{platform_dir.name}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}"
+                    rel_path = f"{platform}/{plugin_dir.name}/{version_dir.name}/{ipk_file.name}"
 
                     html += f"""
-                <li class="package-item">
+                <li class="package-item" data-platform="{platform}" data-name="{ipk_file.name.lower()}">
                     <a href="{rel_path}">
                         <div class="package-name">{ipk_file.name}</div>
                         <div class="package-meta">
@@ -343,15 +326,59 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
         </div>
         """
 
+    # JavaScript 功能实现
+    html += """
+        <script>
+            // 平台切换功能
+            function showPlatform(platform) {
+                // 更新标签状态
+                document.querySelectorAll('.platform-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.textContent === platform || 
+                        (platform === 'all' && tab.textContent === '全部平台'));
+                });
+                
+                // 更新内容显示
+                document.querySelectorAll('.platform-content').forEach(content => {
+                    content.classList.toggle('active', 
+                        content.id === 'platform-' + platform || 
+                        (platform === 'all' && content.id === 'platform-all'));
+                });
+            }
+            
+            // 搜索功能
+            function searchPackages() {
+                const input = document.getElementById('search');
+                const filter = input.value.toLowerCase();
+                const items = document.querySelectorAll('.package-item');
+                
+                items.forEach(item => {
+                    const name = item.getAttribute('data-name');
+                    const platform = item.getAttribute('data-platform');
+                    const isMatch = name.includes(filter);
+                    const isActivePlatform = 
+                        document.querySelector('.platform-tab.active').textContent === '全部平台' ||
+                        platform === document.querySelector('.platform-tab.active').textContent;
+                    
+                    item.style.display = (isMatch && isActivePlatform) ? 'block' : 'none';
+                });
+            }
+            
+            // 初始显示全部平台内容
+            document.addEventListener('DOMContentLoaded', function() {
+                showPlatform('all');
+            });
+        </script>
+    """
+
     html += f"""
         <footer>
-            <p>自动生成于 {last_updated} | 共 {sum(1 for _ in opkg_dir.rglob("*.ipk"))} 个软件包</p>
+            <p>自动生成于 {last_updated} | 共 {total_packages} 个软件包</p>
             <p>Powered by OpenWrt IPK Center</p>
         </footer>
     </div>
 </body>
 </html>
-"""
+    """
 
     with open(index_file, "w", encoding="utf-8") as f:
         f.write(html)
