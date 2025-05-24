@@ -72,44 +72,55 @@ def generate_packages_index(opkg_plugin_path: Path):
         log(f"No IPK files at {opkg_plugin_path}")
         return
 
+    packages_file = opkg_plugin_path / "Packages"
+    gz_file = opkg_plugin_path / "Packages.gz"
+
     try:
-        # 方法1：使用新版工具命令
-        cmd = f"cd '{opkg_plugin_path}' && ipkg-make-index . > Packages"
-        subprocess.run(cmd, shell=True, check=True, executable='/bin/bash')
+        # 方法1：使用系统命令生成（兼容性最好）
+        subprocess.run(
+            ["ipkg-make-index", "."],
+            cwd=opkg_plugin_path,
+            check=True,
+            stdout=open(packages_file, "w")
+        )
+        
+        # 验证文件是否生成
+        if not packages_file.exists():
+            raise FileNotFoundError("Packages file not created")
 
-        # 检查是否生成了有效内容
-        packages_path = opkg_plugin_path / "Packages"
-        if os.path.getsize(packages_path) == 0:
-            raise ValueError("Generated empty Packages file")
-
-        log_ok(f"Generated Packages via ipkg-make-index at {opkg_plugin_path}")
+        # 使用系统gzip命令压缩（避免Python gzip模块问题）
+        subprocess.run(
+            ["gzip", "-9c", "Packages"],
+            cwd=opkg_plugin_path,
+            stdout=open(gz_file, "wb"),
+            check=True
+        )
 
     except Exception as e:
-        log(f"Using fallback method due to: {str(e)}")
-        with open(opkg_plugin_path / "Packages", "w") as f:
+        log(f"Primary method failed: {str(e)}")
+        
+        # 方法2：完全手动生成
+        with open(packages_file, "w") as f:
             for ipk in pkg_files:
                 name_parts = ipk.stem.split('_')
                 pkg_name = '_'.join(name_parts[:-2]) if len(name_parts) > 2 else name_parts[0]
                 version = name_parts[-2] if len(name_parts) >= 2 else "1.0"
-                arch = name_parts[-1] if len(name_parts) >= 1 else "all"
-
+                
                 f.write(f"Package: {pkg_name}\n")
                 f.write(f"Version: {version}\n")
-                f.write(f"Architecture: {arch}\n")
+                f.write(f"Architecture: {name_parts[-1]}\n")
                 f.write(f"Filename: ./{ipk.name}\n")
-                f.write(f"Size: {ipk.stat().st_size}\n")
-                f.write("Description: Auto-generated\n\n")
+                f.write(f"Size: {ipk.stat().st_size}\n\n")
 
-        log_ok(f"Generated fallback Packages at {opkg_plugin_path}")
+        # 手动压缩
+        subprocess.run(
+            ["gzip", "-9c", "Packages"],
+            cwd=opkg_plugin_path,
+            stdout=open(gz_file, "wb"),
+            check=True
+        )
 
-    # 生成 Packages.gz
-    try:
-        with open(opkg_plugin_path / "Packages", 'rb') as f_in:
-            with gzip.open(opkg_plugin_path / "Packages.gz", 'wb') as f_out:
-                shutil.copyfileobj(f_in, f_out)
-        log_ok(f"Generated Packages.gz at {opkg_plugin_path}")
-    except Exception as gz_e:
-        log(f"Failed to generate Packages.gz: {gz_e}")
+    log_ok(f"Index files generated at {opkg_plugin_path}")
 
 # 以下所有函数保持原样未作任何修改
 def sync_plugin(plugin):
