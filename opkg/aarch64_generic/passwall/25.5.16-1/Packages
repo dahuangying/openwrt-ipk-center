@@ -1,0 +1,28 @@
+Package: luci-19.07_luci-app-passwall
+Version: 25.5.16-1
+Architecture: all
+Filename: ./luci-19.07_luci-app-passwall_25.5.16-1_all.ipk
+Size: 851043
+Description: Auto-generated
+
+Package: luci-24.10_luci-i18n-passwall-zh-cn
+Version: 25.135.62106.7b4fe5f
+Architecture: all
+Filename: ./luci-24.10_luci-i18n-passwall-zh-cn_25.135.62106.7b4fe5f_all.ipk
+Size: 15985
+Description: Auto-generated
+
+Package: luci-19.07_luci-i18n-passwall-zh-cn
+Version: 25.5.16-1
+Architecture: all
+Filename: ./luci-19.07_luci-i18n-passwall-zh-cn_25.5.16-1_all.ipk
+Size: 16000
+Description: Auto-generated
+
+Package: luci-24.10_luci-app-passwall
+Version: 25.5.16-r1
+Architecture: all
+Filename: ./luci-24.10_luci-app-passwall_25.5.16-r1_all.ipk
+Size: 851086
+Description: Auto-generated
+
