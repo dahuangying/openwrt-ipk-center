@@ -73,25 +73,27 @@ def generate_packages_index(opkg_plugin_path: Path):
         return
 
     try:
-        # 方法1：使用subprocess.run直接写入文件（兼容性更好）
-        with open(opkg_plugin_path / "Packages", "w") as f:
-            subprocess.run(
-                ["ipkg-make-index", "."],
-                cwd=opkg_plugin_path,
-                check=True,
-                stdout=f,
-                stderr=subprocess.PIPE
-            )
+        # 方法1：使用绝对路径确保可靠性
+        cmd = f"cd '{opkg_plugin_path}' && ipkg-make-index . > Packages"
+        subprocess.run(cmd, shell=True, check=True, executable='/bin/bash')
         
-        # 方法2：如果方法1失败，尝试shell重定向（备用方案）
-        if not (opkg_plugin_path / "Packages").exists() or os.path.getsize(opkg_plugin_path / "Packages") == 0:
-            os.system(f"cd {opkg_plugin_path} && ipkg-make-index . > Packages 2> /dev/null")
+        # 方法2：如果方法1生成的Packages为空，手动创建基本索引
+        if os.path.getsize(opkg_plugin_path / "Packages") == 0:
+            with open(opkg_plugin_path / "Packages", "w") as f:
+                for ipk in pkg_files:
+                    f.write(f"Package: {ipk.stem}\n")
+                    f.write(f"Filename: ./{ipk.name}\n\n")
         
         log_ok(f"Generated Packages in {opkg_plugin_path}")
     except subprocess.CalledProcessError as e:
-        log(f"Failed to generate Packages (exit code {e.returncode}): {e.stderr.decode().strip()}")
+        log(f"Command failed with code {e.returncode}: {e.stderr}")
+        # 回退方案：生成最小化Packages文件
+        with open(opkg_plugin_path / "Packages", "w") as f:
+            for ipk in pkg_files:
+                f.write(f"Package: {ipk.stem}\n")
+                f.write(f"Filename: ./{ipk.name}\n\n")
     except Exception as e:
-        log(f"Unexpected error in generate_packages_index: {str(e)}")
+        log(f"Unexpected error: {str(e)}")
 
 def sync_plugin(plugin):
     log(f"Syncing {plugin['name']}...")
