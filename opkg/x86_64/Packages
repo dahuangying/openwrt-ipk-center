@@ -17,28 +17,28 @@ Filename: passwall2/25.6.21-1/luci-24.10_luci-app-passwall2_25.6.21-r1_all.ipk
 Size: 255385
 
 Package: luci-24.10_luci-i18n-passwall-zh-cn
-Version: 25.185.34407.e688433
+Version: 25.186.64869.58ee3d2
 Architecture: all
-Filename: passwall/25.7.4-1/luci-24.10_luci-i18n-passwall-zh-cn_25.185.34407.e688433_all.ipk
-Size: 16110
-
-Package: luci-24.10_luci-app-passwall
-Version: 25.7.4-r1
-Architecture: all
-Filename: passwall/25.7.4-1/luci-24.10_luci-app-passwall_25.7.4-r1_all.ipk
-Size: 965215
-
-Package: luci-19.07_luci-app-passwall
-Version: 25.7.4-1
-Architecture: all
-Filename: passwall/25.7.4-1/luci-19.07_luci-app-passwall_25.7.4-1_all.ipk
-Size: 965170
+Filename: passwall/25.7.6-1/luci-24.10_luci-i18n-passwall-zh-cn_25.186.64869.58ee3d2_all.ipk
+Size: 16107
 
 Package: luci-19.07_luci-i18n-passwall-zh-cn
-Version: 25.7.4-1
+Version: 25.7.6-1
 Architecture: all
-Filename: passwall/25.7.4-1/luci-19.07_luci-i18n-passwall-zh-cn_25.7.4-1_all.ipk
-Size: 16133
+Filename: passwall/25.7.6-1/luci-19.07_luci-i18n-passwall-zh-cn_25.7.6-1_all.ipk
+Size: 16132
+
+Package: luci-19.07_luci-app-passwall
+Version: 25.7.6-1
+Architecture: all
+Filename: passwall/25.7.6-1/luci-19.07_luci-app-passwall_25.7.6-1_all.ipk
+Size: 965208
+
+Package: luci-24.10_luci-app-passwall
+Version: 25.7.6-r1
+Architecture: all
+Filename: passwall/25.7.6-1/luci-24.10_luci-app-passwall_25.7.6-r1_all.ipk
+Size: 965251
 
 Package: luci-app-shadowsocks
 Version: 2.1.1-1
