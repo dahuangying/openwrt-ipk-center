@@ -35,10 +35,10 @@ Filename: passwall/25.7.6-1/luci-19.07_luci-app-passwall_25.7.6-1_all.ipk
 Size: 965208
 
 Package: luci-app-openclash
-Version: 0.46.120
+Version: 0.46.133
 Architecture: all
-Filename: openclash/v0.46.120/luci-app-openclash_0.46.120_all.ipk
-Size: 9148383
+Filename: openclash/v0.46.133/luci-app-openclash_0.46.133_all.ipk
+Size: 9146596
 
 Package: luci-app-shadowsocks-without-ipset
 Version: 2.1.1-1
