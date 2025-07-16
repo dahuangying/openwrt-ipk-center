@@ -1,38 +1,38 @@
 Package: luci-24.10_luci-app-passwall2
-Version: 25.6.21-r1
+Version: 25.7.15-r1
 Architecture: all
-Filename: passwall2/25.6.21-1/luci-24.10_luci-app-passwall2_25.6.21-r1_all.ipk
-Size: 255385
+Filename: passwall2/25.7.15-1/luci-24.10_luci-app-passwall2_25.7.15-r1_all.ipk
+Size: 260043
 
 Package: luci-24.10_luci-i18n-passwall2-zh-cn
-Version: 25.171.82706.aa5e94a
+Version: 25.196.58873.75064be
 Architecture: all
-Filename: passwall2/25.6.21-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.171.82706.aa5e94a_all.ipk
-Size: 14628
-
-Package: luci-24.10_luci-app-passwall
-Version: 25.7.6-r1
-Architecture: all
-Filename: passwall/25.7.6-1/luci-24.10_luci-app-passwall_25.7.6-r1_all.ipk
-Size: 965251
-
-Package: luci-19.07_luci-i18n-passwall-zh-cn
-Version: 25.7.6-1
-Architecture: all
-Filename: passwall/25.7.6-1/luci-19.07_luci-i18n-passwall-zh-cn_25.7.6-1_all.ipk
-Size: 16132
-
-Package: luci-24.10_luci-i18n-passwall-zh-cn
-Version: 25.186.64869.58ee3d2
-Architecture: all
-Filename: passwall/25.7.6-1/luci-24.10_luci-i18n-passwall-zh-cn_25.186.64869.58ee3d2_all.ipk
-Size: 16107
+Filename: passwall2/25.7.15-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.196.58873.75064be_all.ipk
+Size: 15062
 
 Package: luci-19.07_luci-app-passwall
-Version: 25.7.6-1
+Version: 25.7.15-1
 Architecture: all
-Filename: passwall/25.7.6-1/luci-19.07_luci-app-passwall_25.7.6-1_all.ipk
-Size: 965208
+Filename: passwall/25.7.15-1/luci-19.07_luci-app-passwall_25.7.15-1_all.ipk
+Size: 954491
+
+Package: luci-24.10_luci-app-passwall
+Version: 25.7.15-r1
+Architecture: all
+Filename: passwall/25.7.15-1/luci-24.10_luci-app-passwall_25.7.15-r1_all.ipk
+Size: 954541
+
+Package: luci-24.10_luci-i18n-passwall-zh-cn
+Version: 25.196.30785.1241432
+Architecture: all
+Filename: passwall/25.7.15-1/luci-24.10_luci-i18n-passwall-zh-cn_25.196.30785.1241432_all.ipk
+Size: 16247
+
+Package: luci-19.07_luci-i18n-passwall-zh-cn
+Version: 25.7.15-1
+Architecture: all
+Filename: passwall/25.7.15-1/luci-19.07_luci-i18n-passwall-zh-cn_25.7.15-1_all.ipk
+Size: 16276
 
 Package: luci-app-openclash
 Version: 0.46.133
