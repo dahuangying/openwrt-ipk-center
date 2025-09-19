@@ -1,8 +1,8 @@
 Package: luci-app-openclash
-Version: 0.47.001
+Version: 0.47.006
 Architecture: all
-Filename: openclash/v0.47.001/luci-app-openclash_0.47.001_all.ipk
-Size: 8792659
+Filename: openclash/v0.47.006/luci-app-openclash_0.47.006_all.ipk
+Size: 8812893
 
 Package: luci-19.07_luci-i18n-passwall2-zh-cn
 Version: 25.9.4-1
