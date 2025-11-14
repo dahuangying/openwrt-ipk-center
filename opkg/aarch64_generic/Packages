@@ -1,26 +1,14 @@
-Package: luci-19.07_luci-i18n-passwall2-zh-cn
-Version: 25.11.2-1
+Package: luci-app-passwall2
+Version: 25.11.14-r1
 Architecture: all
-Filename: passwall2/25.11.2-1/luci-19.07_luci-i18n-passwall2-zh-cn_25.11.2-1_all.ipk
-Size: 15671
+Filename: passwall2/25.11.14-1/luci-app-passwall2_25.11.14-r1_all.ipk
+Size: 268138
 
-Package: luci-24.10_luci-app-passwall2
-Version: 25.11.2-r1
+Package: luci-i18n-passwall2-zh-cn
+Version: 25.11.14
 Architecture: all
-Filename: passwall2/25.11.2-1/luci-24.10_luci-app-passwall2_25.11.2-r1_all.ipk
-Size: 268588
-
-Package: luci-24.10_luci-i18n-passwall2-zh-cn
-Version: 25.11.2
-Architecture: all
-Filename: passwall2/25.11.2-1/luci-24.10_luci-i18n-passwall2-zh-cn_25.11.2_all.ipk
-Size: 15641
-
-Package: luci-19.07_luci-app-passwall2
-Version: 25.11.2-1
-Architecture: all
-Filename: passwall2/25.11.2-1/luci-19.07_luci-app-passwall2_25.11.2-1_all.ipk
-Size: 268554
+Filename: passwall2/25.11.14-1/luci-i18n-passwall2-zh-cn_25.11.14_all.ipk
+Size: 18568
 
 Package: luci-app-openclash
 Version: 0.47.028
