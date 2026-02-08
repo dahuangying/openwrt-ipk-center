@@ -1,8 +1,8 @@
 Package: luci-app-openclash
-Version: 0.47.052
+Version: 0.47.055
 Architecture: all
-Filename: openclash/v0.47.052/luci-app-openclash_0.47.052_all.ipk
-Size: 7677760
+Filename: openclash/v0.47.055/luci-app-openclash_0.47.055_all.ipk
+Size: 7697245
 
 Package: luci-app-shadowsocks
 Version: 2.1.1-1
