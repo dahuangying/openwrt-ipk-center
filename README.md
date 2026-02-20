@@ -10,7 +10,7 @@
 ## 📥 OPKG 插件源配置方法
 
 1. 登录 OpenWrt 管理后台。
-2. 打开菜单：**系统 → 软件包 → 配置**。
+2. 打开菜单：**系统 → 软件包 → 配置OPKG**。
 3. 编辑文件 /etc/opkg/customfeeds.conf，根据你的设备添加对应插件源地址。
 4. 注释掉检查签名 #option check_signature，在/etc/opkg.conf文件里面，把option check_signature文件前面加“#”号。
 5. 保存后点击“更新列表”。
