@@ -546,7 +546,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
     log_ok(f"Generated HTML index: {index_file}")
 
 # ✅ 生成平台级 Packages.gz（用于 opkg 源）
-def generate_platform_level_packages_index(opkg_dir: Path):
+def generate_platform_level_packages_index(opkg_dir: Path, config: dict):
     for platform_dir in opkg_dir.glob("*"):
         if not platform_dir.is_dir():
             continue
