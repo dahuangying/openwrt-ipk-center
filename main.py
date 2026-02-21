@@ -629,7 +629,7 @@ def main():
     log_ok("Created .nojekyll")
 
     # ✅ 添加平台级 Packages.gz 生成
-    generate_platform_level_packages_index(OPKG_DIR)
+    generate_platform_level_packages_index(OPKG_DIR, config)
 
 if __name__ == "__main__":
     main()
