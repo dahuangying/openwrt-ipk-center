@@ -584,17 +584,17 @@ def generate_platform_level_packages_index(opkg_dir: Path, config: dict):
                         matched_arch = next((a for a in ARCHS if a in dep_url), None)
 
                         if matched_arch:
-                            # ⭐ 按架构依赖 → 自动替换为三个架构
-                            for arch in ARCHS:
-                                dep_url_arch = dep_url.replace(matched_arch, arch)
-                                # 如果有大版本号，则替换 URL 中的 $release
-                                if openwrt_version:
-                                    dep_url_arch = dep_url_arch.replace("$release", openwrt_version)
-                                f.write(f"Package: {dep_name}\n")
-                                f.write(f"Version: 1.0\n")
-                                f.write(f"Architecture: {arch}\n")
-                                f.write(f"Filename: {dep_url_arch}\n")
-                                f.write(f"Size: 0\n\n")
+                            # ⭐ 按架构依赖 → 只替换为当前平台的架构
+                            current_platform = platform_dir.name
+                            dep_url_arch = dep_url.replace(matched_arch, current_platform)
+                            # 如果有大版本号，则替换 URL 中的 $release
+                            if openwrt_version:
+                                dep_url_arch = dep_url_arch.replace("$release", openwrt_version)
+                            f.write(f"Package: {dep_name}\n")
+                            f.write(f"Version: 1.0\n")
+                            f.write(f"Architecture: {current_platform}\n")
+                            f.write(f"Filename: {dep_url_arch}\n")
+                            f.write(f"Size: 0\n\n")
                         else:
                             # ⭐ 通用依赖 → 只写一条，不生成架构目录
                             dep_url_final = dep_url
