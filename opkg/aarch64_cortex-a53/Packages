@@ -6,20 +6,8 @@ Size: 19465
 
 Package: passwall
 Version: 1.0
-Architecture: aarch64_generic
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/aarch64_generic/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
 Architecture: aarch64_cortex-a53
 Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/aarch64_cortex-a53/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
-Architecture: x86_64
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/x86_64/passwall_packages
 Size: 0
 
 Package: luci-i18n-passwall2-zh-tw
@@ -30,20 +18,8 @@ Size: 19534
 
 Package: passwall
 Version: 1.0
-Architecture: aarch64_generic
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/aarch64_generic/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
 Architecture: aarch64_cortex-a53
 Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/aarch64_cortex-a53/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
-Architecture: x86_64
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/x86_64/passwall_packages
 Size: 0
 
 Package: luci-app-passwall2
@@ -54,20 +30,8 @@ Size: 319302
 
 Package: passwall
 Version: 1.0
-Architecture: aarch64_generic
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/aarch64_generic/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
 Architecture: aarch64_cortex-a53
 Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/aarch64_cortex-a53/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
-Architecture: x86_64
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages/$release/x86_64/passwall_packages
 Size: 0
 
 Package: luci-app-openclash
@@ -96,20 +60,8 @@ Size: 884490
 
 Package: passwall
 Version: 1.0
-Architecture: aarch64_generic
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/aarch64_generic/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
 Architecture: aarch64_cortex-a53
 Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/aarch64_cortex-a53/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
-Architecture: x86_64
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/x86_64/passwall_packages
 Size: 0
 
 Package: 22.03-_luci-i18n-passwall-zh-cn
@@ -120,20 +72,8 @@ Size: 17543
 
 Package: passwall
 Version: 1.0
-Architecture: aarch64_generic
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/aarch64_generic/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
 Architecture: aarch64_cortex-a53
 Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/aarch64_cortex-a53/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
-Architecture: x86_64
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/x86_64/passwall_packages
 Size: 0
 
 Package: 22.03-_luci-app-passwall
@@ -144,20 +84,8 @@ Size: 884474
 
 Package: passwall
 Version: 1.0
-Architecture: aarch64_generic
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/aarch64_generic/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
 Architecture: aarch64_cortex-a53
 Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/aarch64_cortex-a53/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
-Architecture: x86_64
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/x86_64/passwall_packages
 Size: 0
 
 Package: 23.05-24.10_luci-i18n-passwall-zh-cn
@@ -168,19 +96,7 @@ Size: 17479
 
 Package: passwall
 Version: 1.0
-Architecture: aarch64_generic
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/aarch64_generic/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
 Architecture: aarch64_cortex-a53
 Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/aarch64_cortex-a53/passwall_packages
-Size: 0
-
-Package: passwall
-Version: 1.0
-Architecture: x86_64
-Filename: src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-23.05-24.10/x86_64/passwall_packages
 Size: 0
 
