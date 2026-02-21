@@ -566,12 +566,15 @@ def generate_platform_level_packages_index(opkg_dir: Path):
                 f.write(f"Filename: {ipk.relative_to(platform_dir)}\n")
                 f.write(f"Size: {ipk.stat().st_size}\n\n")
 
-                # ✅ 新增：写官方依赖条目（自动判断是否为按架构依赖）
+                # ✅ 新增：写官方依赖条目自动生成依赖链接
                 plugin_name = ipk.parts[-3]  # opkg/<platform>/<plugin>/<version>/<ipk>
                 plugin_config = next((p for p in config['plugins'] if p['name'] == plugin_name), None)
                 if plugin_config:
                     # 提取 OpenWrt 大版本号（假设 ipk 文件名开头是 22.03 或 23.05-24.10）
                     openwrt_version = ipk.stem.split('_')[0]
+                    # 如果检测到不是大版本号格式，就忽略
+                    if not (openwrt_version[:2].isdigit() and '.' in openwrt_version):
+                        openwrt_version = None
 				
                     for dep_url in plugin_config.get("depends_official", []):
                         dep_name = dep_url.split('/')[-1].split('_')[0]  # 提取依赖包名
@@ -583,6 +586,9 @@ def generate_platform_level_packages_index(opkg_dir: Path):
                             # ⭐ 按架构依赖 → 自动替换为三个架构
                             for arch in ARCHS:
                                 dep_url_arch = dep_url.replace(matched_arch, arch)
+                                # 如果有大版本号，则替换 URL 中的 $release
+                                if openwrt_version:
+                                    dep_url_arch = dep_url_arch.replace("$release", openwrt_version)
                                 f.write(f"Package: {dep_name}\n")
                                 f.write(f"Version: 1.0\n")
                                 f.write(f"Architecture: {arch}\n")
@@ -590,10 +596,13 @@ def generate_platform_level_packages_index(opkg_dir: Path):
                                 f.write(f"Size: 0\n\n")
                         else:
                             # ⭐ 通用依赖 → 只写一条，不生成架构目录
+                            dep_url_final = dep_url
+                            if openwrt_version:
+                                dep_url_final = dep_url_final.replace("$release", openwrt_version)
                             f.write(f"Package: {dep_name}\n")
                             f.write(f"Version: 1.0\n")
                             f.write(f"Architecture: all\n")
-                            f.write(f"Filename: {dep_url}\n")
+                            f.write(f"Filename: {dep_url_final}\n")
                             f.write(f"Size: 0\n\n")
 								
         subprocess.run(["gzip", "-9c", "Packages"], cwd=platform_dir, stdout=open(gz_file, "wb"), check=True)
