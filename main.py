@@ -566,22 +566,34 @@ def generate_platform_level_packages_index(opkg_dir: Path):
                 f.write(f"Filename: {ipk.relative_to(platform_dir)}\n")
                 f.write(f"Size: {ipk.stat().st_size}\n\n")
 
-                # ✅ 新增：写官方依赖条目（自动生成三个架构的链接）
+                # ✅ 新增：写官方依赖条目（自动判断是否为按架构依赖）
                 plugin_name = ipk.parts[-3]  # opkg/<platform>/<plugin>/<version>/<ipk>
                 plugin_config = next((p for p in config['plugins'] if p['name'] == plugin_name), None)
                 if plugin_config:
+                    # 提取 OpenWrt 大版本号（假设 ipk 文件名开头是 22.03 或 23.05-24.10）
+                    openwrt_version = ipk.stem.split('_')[0]
+				
                     for dep_url in plugin_config.get("depends_official", []):
                         dep_name = dep_url.split('/')[-1].split('_')[0]  # 提取依赖包名
-                        for arch in plugin_config['platforms']:
-                            # 自动替换或添加架构到 URL
-                            if any(a in dep_url for a in ["aarch64_cortex-a53", "aarch64_generic", "x86_64"]):
-                                dep_url_arch = dep_url.replace("aarch64_cortex-a53", arch).replace("aarch64_generic", arch).replace("x86_64", arch)
-                            else:
-                                dep_url_arch = dep_url.rstrip('/') + f"/{arch}/{dep_name}.ipk"
+
+                        # 判断是否包含架构
+                        matched_arch = next((a for a in ARCHS if a in dep_url), None)
+
+                        if matched_arch:
+                            # ⭐ 按架构依赖 → 自动替换为三个架构
+                            for arch in ARCHS:
+                                dep_url_arch = dep_url.replace(matched_arch, arch)
+                                f.write(f"Package: {dep_name}\n")
+                                f.write(f"Version: 1.0\n")
+                                f.write(f"Architecture: {arch}\n")
+                                f.write(f"Filename: {dep_url_arch}\n")
+                                f.write(f"Size: 0\n\n")
+                        else:
+                            # ⭐ 通用依赖 → 只写一条，不生成架构目录
                             f.write(f"Package: {dep_name}\n")
-                            f.write(f"Version: 1.0\n")  # 默认版本
-                            f.write(f"Architecture: {arch}\n")
-                            f.write(f"Filename: {dep_url_arch}\n")
+                            f.write(f"Version: 1.0\n")
+                            f.write(f"Architecture: all\n")
+                            f.write(f"Filename: {dep_url}\n")
                             f.write(f"Size: 0\n\n")
 								
         subprocess.run(["gzip", "-9c", "Packages"], cwd=platform_dir, stdout=open(gz_file, "wb"), check=True)
