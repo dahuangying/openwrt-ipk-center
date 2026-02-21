@@ -547,6 +547,7 @@ def generate_html_index(opkg_dir: Path, output_path: Path):
 
 # ✅ 生成平台级 Packages.gz（用于 opkg 源）
 def generate_platform_level_packages_index(opkg_dir: Path, config: dict):
+    ARCHS = ["aarch64_generic", "aarch64_cortex-a53", "x86_64"]
     for platform_dir in opkg_dir.glob("*"):
         if not platform_dir.is_dir():
             continue
