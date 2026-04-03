@@ -4,47 +4,47 @@ Architecture: all
 Filename: openclash/v0.47.075/luci-app-openclash_0.47.075_all.ipk
 Size: 6697905
 
-Package: luci-i18n-passwall2-zh-tw
-Version: 26.3.5
+Package: luci-app-passwall2
+Version: 26.4.2-r1
 Architecture: all
-Filename: passwall2/26.3.5-1/luci-i18n-passwall2-zh-tw_26.3.5_all.ipk
-Size: 19321
+Filename: passwall2/26.4.2-1/luci-app-passwall2_26.4.2-r1_all.ipk
+Size: 324726
 
 Package: luci-i18n-passwall2-zh-cn
-Version: 26.3.5
+Version: 26.4.2
 Architecture: all
-Filename: passwall2/26.3.5-1/luci-i18n-passwall2-zh-cn_26.3.5_all.ipk
-Size: 19247
+Filename: passwall2/26.4.2-1/luci-i18n-passwall2-zh-cn_26.4.2_all.ipk
+Size: 19734
 
-Package: luci-app-passwall2
-Version: 26.3.5-r1
+Package: luci-i18n-passwall2-zh-tw
+Version: 26.4.2
 Architecture: all
-Filename: passwall2/26.3.5-1/luci-app-passwall2_26.3.5-r1_all.ipk
-Size: 320687
-
-Package: 22.03-_luci-app-passwall
-Version: 26.4.1
-Architecture: all
-Filename: passwall/26.4.1-1/22.03-_luci-app-passwall_26.4.1_all.ipk
-Size: 889612
-
-Package: 23.05-24.10_luci-app-passwall
-Version: 26.4.1-r1
-Architecture: all
-Filename: passwall/26.4.1-1/23.05-24.10_luci-app-passwall_26.4.1-r1_all.ipk
-Size: 889622
+Filename: passwall2/26.4.2-1/luci-i18n-passwall2-zh-tw_26.4.2_all.ipk
+Size: 19834
 
 Package: 22.03-_luci-i18n-passwall-zh-cn
-Version: 26.4.1
+Version: 26.4.3
 Architecture: all
-Filename: passwall/26.4.1-1/22.03-_luci-i18n-passwall-zh-cn_26.4.1_all.ipk
-Size: 17846
+Filename: passwall/26.4.3-1/22.03-_luci-i18n-passwall-zh-cn_26.4.3_all.ipk
+Size: 17946
 
 Package: 23.05-24.10_luci-i18n-passwall-zh-cn
-Version: 26.4.1
+Version: 26.4.3
 Architecture: all
-Filename: passwall/26.4.1-1/23.05-24.10_luci-i18n-passwall-zh-cn_26.4.1_all.ipk
-Size: 17780
+Filename: passwall/26.4.3-1/23.05-24.10_luci-i18n-passwall-zh-cn_26.4.3_all.ipk
+Size: 17877
+
+Package: 23.05-24.10_luci-app-passwall
+Version: 26.4.3-r1
+Architecture: all
+Filename: passwall/26.4.3-1/23.05-24.10_luci-app-passwall_26.4.3-r1_all.ipk
+Size: 890896
+
+Package: 22.03-_luci-app-passwall
+Version: 26.4.3
+Architecture: all
+Filename: passwall/26.4.3-1/22.03-_luci-app-passwall_26.4.3_all.ipk
+Size: 890873
 
 Package: luci-app-shadowsocks-without-ipset
 Version: 2.1.1-1
