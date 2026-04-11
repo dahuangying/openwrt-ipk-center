@@ -53,8 +53,8 @@ Filename: passwall/26.4.6-1/22.03-_luci-app-passwall_26.4.6_all.ipk
 Size: 892031
 
 Package: luci-app-openclash
-Version: 0.47.086
+Version: 0.47.088
 Architecture: all
-Filename: openclash/v0.47.086/luci-app-openclash_0.47.086_all.ipk
-Size: 6765910
+Filename: openclash/v0.47.088/luci-app-openclash_0.47.088_all.ipk
+Size: 6749393
 
