@@ -35,10 +35,10 @@ Filename: shadowsocks/v2.1.1/luci-app-shadowsocks-without-ipset_2.1.1-1_all.ipk
 Size: 15019
 
 Package: luci-app-openclash
-Version: 0.47.088
+Version: 0.47.096
 Architecture: all
-Filename: openclash/v0.47.088/luci-app-openclash_0.47.088_all.ipk
-Size: 6749393
+Filename: openclash/v0.47.096/luci-app-openclash_0.47.096_all.ipk
+Size: 7327169
 
 Package: 22.03-_luci-app-passwall
 Version: 26.5.20
