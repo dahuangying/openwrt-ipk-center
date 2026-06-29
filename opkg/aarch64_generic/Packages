@@ -47,10 +47,10 @@ Filename: passwall/26.6.2-1/23.05-24.10_luci-i18n-passwall-zh-cn_26.6.2_all.ipk
 Size: 17864
 
 Package: luci-app-openclash
-Version: 0.47.096
+Version: 0.47.110
 Architecture: all
-Filename: openclash/v0.47.096/luci-app-openclash_0.47.096_all.ipk
-Size: 7327169
+Filename: openclash/v0.47.110/luci-app-openclash_0.47.110_all.ipk
+Size: 9236589
 
 Package: luci-app-shadowsocks
 Version: 2.1.1-1
