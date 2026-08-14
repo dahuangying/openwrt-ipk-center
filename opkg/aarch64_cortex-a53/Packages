@@ -1,26 +1,32 @@
-Package: luci-i18n-passwall2-ru
-Version: 26.8.10
-Architecture: all
-Filename: passwall2/26.8.10-1/luci-i18n-passwall2-ru_26.8.10_all.ipk
-Size: 23980
-
-Package: luci-i18n-passwall2-zh-tw
-Version: 26.8.10
-Architecture: all
-Filename: passwall2/26.8.10-1/luci-i18n-passwall2-zh-tw_26.8.10_all.ipk
-Size: 20290
-
 Package: luci-i18n-passwall2-zh-cn
-Version: 26.8.10
+Version: 26.8.14
 Architecture: all
-Filename: passwall2/26.8.10-1/luci-i18n-passwall2-zh-cn_26.8.10_all.ipk
-Size: 20125
+Filename: passwall2/26.8.14-1/luci-i18n-passwall2-zh-cn_26.8.14_all.ipk
+Size: 20058
+
+Package: luci-i18n-passwall2-fa
+Version: 26.8.14
+Architecture: all
+Filename: passwall2/26.8.14-1/luci-i18n-passwall2-fa_26.8.14_all.ipk
+Size: 22863
+
+Package: luci-i18n-passwall2-ru
+Version: 26.8.14
+Architecture: all
+Filename: passwall2/26.8.14-1/luci-i18n-passwall2-ru_26.8.14_all.ipk
+Size: 23880
 
 Package: luci-app-passwall2
-Version: 26.8.10-r1
+Version: 26.8.14-r1
 Architecture: all
-Filename: passwall2/26.8.10-1/luci-app-passwall2_26.8.10-r1_all.ipk
-Size: 346011
+Filename: passwall2/26.8.14-1/luci-app-passwall2_26.8.14-r1_all.ipk
+Size: 346763
+
+Package: luci-i18n-passwall2-zh-tw
+Version: 26.8.14
+Architecture: all
+Filename: passwall2/26.8.14-1/luci-i18n-passwall2-zh-tw_26.8.14_all.ipk
+Size: 20227
 
 Package: luci-app-shadowsocks-without-ipset
 Version: 2.1.1-1
