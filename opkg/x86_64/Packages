@@ -16,29 +16,29 @@ Architecture: all
 Filename: openclash/v0.47.156/luci-app-openclash_0.47.156_all.ipk
 Size: 10424509
 
-Package: 23.05-24.10_luci-i18n-passwall-zh-cn
-Version: 26.9.16
+Package: 23.05-24.10_luci-app-passwall
+Version: 26.9.26-r1
 Architecture: all
-Filename: passwall/26.9.16-1/23.05-24.10_luci-i18n-passwall-zh-cn_26.9.16_all.ipk
-Size: 17931
+Filename: passwall/26.9.26-1/23.05-24.10_luci-app-passwall_26.9.26-r1_all.ipk
+Size: 841686
 
 Package: 22.03-_luci-app-passwall
-Version: 26.9.16
+Version: 26.9.26
 Architecture: all
-Filename: passwall/26.9.16-1/22.03-_luci-app-passwall_26.9.16_all.ipk
-Size: 838824
+Filename: passwall/26.9.26-1/22.03-_luci-app-passwall_26.9.26_all.ipk
+Size: 841651
 
 Package: 22.03-_luci-i18n-passwall-zh-cn
-Version: 26.9.16
+Version: 26.9.26
 Architecture: all
-Filename: passwall/26.9.16-1/22.03-_luci-i18n-passwall-zh-cn_26.9.16_all.ipk
-Size: 17996
+Filename: passwall/26.9.26-1/22.03-_luci-i18n-passwall-zh-cn_26.9.26_all.ipk
+Size: 18073
 
-Package: 23.05-24.10_luci-app-passwall
-Version: 26.9.16-r1
+Package: 23.05-24.10_luci-i18n-passwall-zh-cn
+Version: 26.9.26
 Architecture: all
-Filename: passwall/26.9.16-1/23.05-24.10_luci-app-passwall_26.9.16-r1_all.ipk
-Size: 838864
+Filename: passwall/26.9.26-1/23.05-24.10_luci-i18n-passwall-zh-cn_26.9.26_all.ipk
+Size: 18003
 
 Package: luci-i18n-passwall2-zh-cn
 Version: 26.9.16
